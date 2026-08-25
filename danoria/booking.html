@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danoria — Flight Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body.booking-page {
+            background: var(--dark-950);
+            min-height: 100vh;
+            color: var(--light-100);
+            padding: 5rem 1.5rem 3rem;
+        }
+
+        /* ── Page wrapper ── */
+        .checkout-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .checkout-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .back-home {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--primary-light);
+            border: 1px solid rgba(14,165,233,0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .back-home:hover { background: rgba(14,165,233,0.1); border-color: var(--primary); color: var(--white); }
+
+        /* ── Flight summary card ── */
+        .flight-summary-card {
+            background: rgba(14,165,233,0.06);
+            border: 1px solid rgba(14,165,233,0.18);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .fs-route { font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 0.3rem; }
+        .fs-meta  { font-size: 0.8rem; color: var(--dark-500); display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .fs-meta span strong { color: var(--light-300); }
+        .fs-prices { text-align: right; }
+        .fs-prices .price-row { font-size: 0.78rem; color: var(--dark-500); margin-bottom: 2px; }
+        .fs-prices .price-row strong { color: var(--light-300); }
+        .fs-total { font-size: 1.8rem; font-weight: 800; color: var(--success); margin-top: 0.5rem; }
+        .fs-total small { font-size: 0.75rem; color: var(--dark-500); display: block; font-weight: 400; }
+
+        /* ── Passenger tabs ── */
+        .pax-tabs-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .pax-tab {
+            padding: 0.55rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03);
+            color: var(--dark-500);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .pax-tab.active   { background: rgba(14,165,233,0.15); border-color: var(--primary); color: var(--primary-light); }
+        .pax-tab.complete { background: rgba(16,185,129,0.12); border-color: var(--success);  color: var(--success); }
+        .pax-tab .pax-check { display: none; }
+        .pax-tab.complete .pax-check { display: inline; }
+        .pax-tab.complete .pax-num   { display: none; }
+
+        /* ── Passenger form panel ── */
+        .pax-panel { display: none; }
+        .pax-panel.active { display: block; animation: fadeSlide 0.35s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+        .pax-panel-inner {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 2rem;
+        }
+        @media(max-width: 768px) { .pax-panel-inner { grid-template-columns: 1fr; } }
+
+        .form-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--dark-500);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .form-section-title i { color: var(--primary); }
+
+        .field-group { margin-bottom: 1rem; }
+        .field-group label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--dark-500); font-weight: 500; display: block; margin-bottom: 0.35rem; }
+
+        .seat-section {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        /* ── Nav buttons ── */
+        .pax-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+        .btn-pax-prev {
+            padding: 0.75rem 1.75rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: var(--light-300);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .btn-pax-prev:hover { background: rgba(255,255,255,0.05); }
+        .btn-pax-next {
+            padding: 0.75rem 1.75rem;
+            background: var(--gradient-ocean);
+            color: var(--white);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(14,165,233,0.3);
+        }
+        .btn-pax-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14,165,233,0.4); }
+
+        /* ── Payment Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.92);
+            backdrop-filter: blur(14px);
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+
+        .payment-card {
+            background: var(--dark-900);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            width: 95%;
+            max-width: 520px;
+            padding: 2.5rem;
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .payment-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient-ocean);
+        }
+        .modal-overlay.visible .payment-card { transform: scale(1) translateY(0); }
+
+        .payment-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+        }
+        .payment-subtitle { font-size: 0.85rem; color: var(--dark-500); margin-bottom: 1.75rem; }
+
+        .order-summary {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--dark-500);
+            margin-bottom: 0.6rem;
+        }
+        .order-row strong { color: var(--light-300); }
+        .order-row.total { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; margin-top: 0.5rem; }
+        .order-row.total strong { color: var(--success); font-size: 1.1rem; }
+
+        .payment-methods { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .pay-method {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.85rem;
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            color: var(--light-300);
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .pay-method i { font-size: 1.2rem; color: var(--primary); }
+        .pay-method:hover, .pay-method.active {
+            border-color: var(--primary);
+            background: rgba(14,165,233,0.08);
+            color: var(--white);
+        }
+
+        .card-fields { display: none; margin-bottom: 1.5rem; }
+        .card-fields.visible { display: block; }
+        .card-fields .field-group { margin-bottom: 0.75rem; }
+        .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+        .btn-pay {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 12px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        }
+        .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+
+        /* ── Ticket Slide Panel ── */
+        .tickets-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2,6,23,0.96);
+            backdrop-filter: blur(16px);
+            z-index: 9500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s;
+            padding: 1rem;
+        }
+        .tickets-overlay.visible { opacity: 1; visibility: visible; }
+
+        .tickets-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .tickets-header h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: 0.3rem;
+        }
+        .tickets-header p { color: var(--dark-500); font-size: 0.9rem; }
+
+        /* Carousel */
+        .ticket-carousel {
+            width: 100%;
+            max-width: 520px;
+            position: relative;
+        }
+        .ticket-slides { overflow: hidden; border-radius: 16px; }
+        .ticket-slide {
+            display: none;
+            animation: slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .ticket-slide.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        /* The actual ticket card */
+        .e-ticket {
+            background: white;
+            color: #1e293b;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .e-ticket-header {
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .e-ticket-header h3 { font-size: 1.3rem; font-weight: 700; margin: 0; }
+        .e-ticket-header p  { font-size: 0.72rem; opacity: 0.8; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        .e-ticket-pnr {
+            background: rgba(0,0,0,0.15);
+            padding: 0.3rem 0.9rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .e-ticket-body { padding: 1.75rem 2rem; }
+        .e-ticket-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.1rem;
+            gap: 1rem;
+        }
+        .e-ticket-field { flex: 1; }
+        .e-ticket-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 600; margin-bottom: 3px; }
+        .e-ticket-val { font-size: 0.92rem; font-weight: 700; color: #0f172a; }
+        .e-ticket-val.seat { color: #10b981; font-size: 1.1rem; }
+        .e-ticket-divider {
+            border-top: 2px dashed #e2e8f0;
+            margin: 1.25rem -2rem;
+            position: relative;
+        }
+        .e-ticket-divider::before,
+        .e-ticket-divider::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            width: 20px; height: 20px;
+            background: var(--dark-950);
+            border-radius: 50%;
+        }
+        .e-ticket-divider::before { left: -10px; }
+        .e-ticket-divider::after  { right: -10px; }
+        .e-ticket-barcode { text-align: center; padding-top: 0.5rem; }
+        .barcode-bars {
+            height: 42px;
+            background: repeating-linear-gradient(90deg, #000 0, #000 2px, #fff 2px, #fff 8px);
+            max-width: 280px;
+            margin: 0 auto 0.5rem;
+        }
+        .barcode-num { font-family: monospace; font-size: 0.8rem; letter-spacing: 2px; color: #64748b; }
+        .e-ticket-stamp {
+            display: inline-block;
+            border: 2px solid #10b981;
+            color: #10b981;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 4px;
+            transform: rotate(-8deg);
+            margin-left: 1rem;
+        }
+        .e-ticket-type-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .badge-adult { background: #dbeafe; color: #1d4ed8; }
+        .badge-child { background: #fef9c3; color: #854d0e; }
+
+        /* Carousel nav */
+        .carousel-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+        .carousel-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--white);
+            font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .carousel-btn:hover { background: var(--primary); border-color: var(--primary); }
+        .carousel-dots { display: flex; gap: 6px; }
+        .carousel-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .carousel-dot.active { background: var(--primary); transform: scale(1.3); }
+
+        /* Ticket action buttons */
+        .ticket-actions-bar {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-ticket-act {
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex; align-items: center; gap: 0.4rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .btn-print { background: var(--primary); color: white; }
+        .btn-print:hover { background: var(--primary-dark); }
+        .btn-home  { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: var(--light-300); }
+        .btn-home:hover { background: rgba(255,255,255,0.12); }
+
+        /* ── Progress bar ── */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 2rem;
+        }
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            position: relative;
+            flex: 1;
+        }
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.08);
+            z-index: 0;
+        }
+        .progress-step.done:not(:last-child)::after { background: var(--primary); }
+        .step-circle {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            border: 2px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; font-weight: 700;
+            position: relative; z-index: 1;
+            transition: all 0.3s;
+        }
+        .progress-step.active .step-circle { background: var(--primary); border-color: var(--primary); color: white; }
+        .progress-step.done   .step-circle { background: var(--success); border-color: var(--success); color: white; }
+        .step-label { font-size: 0.68rem; color: var(--dark-500); text-align: center; }
+        .progress-step.active .step-label, .progress-step.done .step-label { color: var(--light-300); }
+
+        /* ── Loader overlay ── */
+        .page-loader {
+            position: fixed; inset: 0;
+            background: rgba(2,6,23,0.92);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 1rem;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s;
+        }
+        .page-loader.visible { opacity: 1; visibility: visible; }
+        .page-loader p { color: var(--dark-500); font-size: 0.9rem; }
+        .spin { width: 50px; height: 50px; border: 3px solid rgba(14,165,233,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media print {
+            body * { visibility: hidden; }
+            .e-ticket, .e-ticket * { visibility: visible; }
+            .e-ticket { position: fixed; inset: 0; }
+        }
+    </style>
+</head>
+<body class="booking-page">
+
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">✈</span>
+                <span class="logo-text">Danoria</span>
+            </a>
+            <div class="nav-actions">
+                <span id="userGreeting" style="font-size:0.9rem;color:var(--dark-500);font-weight:500;"></span>
+                <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="spin"></div>
+        <p id="loaderMsg">Processing your booking...</p>
+    </div>
+
+    <!-- Payment modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="payment-card">
+            <h2 class="payment-title"><i class="fas fa-lock" style="color:var(--primary);font-size:1.2rem;margin-right:.5rem;"></i>Secure Payment</h2>
+            <p class="payment-subtitle">Review your order and complete payment to confirm tickets.</p>
+
+            <div class="order-summary" id="orderSummary">
+                <!-- Populated dynamically -->
+            </div>
+
+            <div class="payment-methods">
+                <div class="pay-method active" data-method="card">
+                    <i class="fas fa-credit-card"></i> Credit Card
+                </div>
+                <div class="pay-method" data-method="paypal">
+                    <i class="fab fa-paypal"></i> PayPal
+                </div>
+                <div class="pay-method" data-method="bank">
+                    <i class="fas fa-university"></i> Bank Transfer
+                </div>
+            </div>
+
+            <div class="card-fields visible" id="cardFields">
+                <div class="field-group">
+                    <label>Card Number</label>
+                    <input type="text" class="auth-input" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+                <div class="card-row">
+                    <div class="field-group">
+                        <label>Expiry</label>
+                        <input type="text" class="auth-input" id="cardExpiry" placeholder="MM / YY" maxlength="7">
+                    </div>
+                    <div class="field-group">
+                        <label>CVV</label>
+                        <input type="text" class="auth-input" id="cardCvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-pay" id="btnConfirmPayment">
+                <i class="fas fa-shield-alt"></i>
+                <span id="btnPayLabel">Confirm & Pay</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tickets overlay (carousel) -->
+    <div class="tickets-overlay" id="ticketsOverlay">
+        <div class="tickets-header">
+            <h2>🎉 Booking Confirmed!</h2>
+            <p>Your e-tickets are ready. Swipe through each passenger's boarding pass.</p>
+        </div>
+        <div class="ticket-carousel">
+            <div class="ticket-slides" id="ticketSlides">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="carousel-nav" id="carouselNav" style="display:none;">
+                <button class="carousel-btn" id="prevTicket"><i class="fas fa-chevron-left"></i></button>
+                <div class="carousel-dots" id="carouselDots"></div>
+                <button class="carousel-btn" id="nextTicket"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="ticket-actions-bar">
+            <button class="btn-ticket-act btn-print" id="btnPrintTicket"><i class="fas fa-print"></i> Print This Ticket</button>
+            <button class="btn-ticket-act btn-home"  id="btnTicketHome"><i class="fas fa-home"></i> Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Main checkout -->
+    <div class="checkout-wrap">
+        <div class="checkout-title">
+            <span><i class="fas fa-file-invoice" style="color:var(--primary);margin-right:.5rem;"></i>Flight Checkout</span>
+            <a href="index.html" class="back-home"><i class="fas fa-chevron-left"></i> Cancel</a>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar" id="progressBar">
+            <!-- Populated dynamically based on passenger count -->
+        </div>
+
+        <!-- Flight summary -->
+        <div class="flight-summary-card" id="flightSummary"></div>
+
+        <!-- Passenger forms (tabs) -->
+        <div class="pax-tabs-bar" id="paxTabsBar"></div>
+        <div id="paxPanels"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+    // ═══════════════════════════════════════════════════════
+    // URL PARAMS
+    // ═══════════════════════════════════════════════════════
+    const params      = new URLSearchParams(window.location.search);
+    const flightCode  = params.get('flight')   || '';
+    const routeName   = params.get('route')    || 'Unknown Route';
+    const depDate     = params.get('depDate')  || '';
+    const retDate     = params.get('retDate')  || '';
+    const cabinClass  = params.get('class')    || 'economy';
+    const fromCode    = params.get('from')     || '';
+    const toCode      = params.get('to')       || '';
+    const paxParam    = params.get('pax')      || '1 Adult';  // e.g. "2 Adults", "2 Adults 1 Child"
+
+    let flightPrice   = params.get('price')    || '$0';
+    let currentUser   = null;
+    let currentPaxIdx = 0;
+    let selectedPayMethod = 'card';
+
+    // Parse passenger count from paxParam
+    function parsePax(str) {
+        const adults  = (str.match(/(\d+)\s*adult/i)  || [0,0])[1];
+        const children= (str.match(/(\d+)\s*child/i)  || [0,0])[1];
+        const list = [];
+        for (let i = 0; i < parseInt(adults);   i++) list.push({ type: 'adult',  label: `Adult ${i+1}` });
+        for (let i = 0; i < parseInt(children); i++) list.push({ type: 'child',  label: `Child ${i+1}` });
+        if (list.length === 0) list.push({ type: 'adult', label: 'Adult 1' });
+        return list;
+    }
+
+    const passengers = parsePax(paxParam);  // [{ type, label }, ...]
+
+    // Per-passenger state
+    const paxData = passengers.map(() => ({
+        name: '', passport: '', cnic: '', seat: null, photo: '', photoB64: ''
+    }));
+
+    // ═══════════════════════════════════════════════════════
+    // BOOT
+    // ═══════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Auth check
+        try {
+            const r = await fetch('api_auth.php?action=session');
+            const d = await r.json();
+            if (d.loggedIn) {
+                currentUser = d.user;
+            } else {
+                const saved = localStorage.getItem('danoria_current_user');
+                if (saved) currentUser = JSON.parse(saved);
+                else { alert('Please log in first.'); window.location.href = 'index.html?triggerAuth=true'; return; }
+            }
+        } catch {
+            const saved = localStorage.getItem('danoria_current_user');
+            if (saved) currentUser = JSON.parse(saved);
+            else { alert('Please log in first.'); window.location.href = 'index.html?triggerAuth=true'; return; }
+        }
+
+        document.getElementById('userGreeting').textContent = `Hi, ${currentUser.name}`;
+
+        // Pre-fill first passenger name from account
+        paxData[0].name = currentUser.name;
+
+        buildProgressBar();
+        buildTabs();
+        buildPanels();
+        showPanel(0);
+        fetchFlightSummary();
+        initPaymentModal();
+        initTicketCarousel();
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // FLIGHT SUMMARY
+    // ═══════════════════════════════════════════════════════
+    async function fetchFlightSummary() {
+        if (!fromCode || !toCode) { renderSummary(flightPrice); return; }
+        try {
+            const r = await fetch(`api_flights.php?action=get_price&from=${fromCode}&to=${toCode}&class=${cabinClass}`);
+            const d = await r.json();
+            if (d.status === 'success' && d.flights.length) {
+                const match = d.flights.find(f => f.flight_code === flightCode) || d.flights[0];
+                flightPrice = match.price;
+                window._flightMeta = match;
+                renderSummary(match.price, match);
+            } else renderSummary(flightPrice);
+        } catch { renderSummary(flightPrice); }
+    }
+
+    function renderSummary(price, f = null) {
+        const numericPrice = parseFloat((price || '$0').replace(/[^0-9.]/g, '')) || 0;
+        const totalNumeric = (numericPrice * passengers.length).toFixed(2);
+        const paxLabel = passengers.length === 1 ? '1 passenger' : `${passengers.length} passengers`;
+
+        document.getElementById('flightSummary').innerHTML = `
+            <div>
+                <div class="fs-route">${routeName}</div>
+                <div class="fs-meta">
+                    <span>Flight: <strong>${flightCode}</strong></span>
+                    <span>Class: <strong>${cabinClass.charAt(0).toUpperCase()+cabinClass.slice(1)}</strong></span>
+                    <span>Date: <strong>${depDate || '—'}</strong></span>
+                    <span>Passengers: <strong>${paxLabel}</strong></span>
+                    ${f ? `<span>Duration: <strong>${f.duration}</strong></span>` : ''}
+                </div>
+                ${f ? `<div class="fs-meta" style="margin-top:.3rem;">
+                    <span>Economy: <strong>${f.economy_price}</strong></span>
+                    <span>Business: <strong>${f.business_price}</strong></span>
+                    <span>First: <strong>${f.first_price}</strong></span>
+                </div>` : ''}
+            </div>
+            <div class="fs-prices">
+                <div class="price-row">Per person: <strong>${price}</strong></div>
+                <div class="price-row">×${passengers.length} passenger${passengers.length > 1 ? 's' : ''}</div>
+                <div class="fs-total">$${totalNumeric}<small>Total fare</small></div>
+            </div>
+        `;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PROGRESS BAR
+    // ═══════════════════════════════════════════════════════
+    function buildProgressBar() {
+        const bar = document.getElementById('progressBar');
+        const steps = [...passengers.map((p, i) => `${p.type === 'child' ? '👶' : '👤'} ${p.label}`), '💳 Payment'];
+        bar.innerHTML = steps.map((s, i) => `
+            <div class="progress-step ${i === 0 ? 'active' : ''}" id="step-${i}">
+                <div class="step-circle">${i+1}</div>
+                <div class="step-label">${s}</div>
+            </div>
+        `).join('');
+    }
+
+    function updateProgress(idx) {
+        const totalSteps = passengers.length + 1; // +1 for payment
+        for (let i = 0; i < totalSteps; i++) {
+            const el = document.getElementById(`step-${i}`);
+            if (!el) continue;
+            el.classList.remove('active','done');
+            if (i < idx) el.classList.add('done');
+            else if (i === idx) el.classList.add('active');
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // TABS
+    // ═══════════════════════════════════════════════════════
+    function buildTabs() {
+        const bar = document.getElementById('paxTabsBar');
+        bar.innerHTML = passengers.map((p, i) => `
+            <div class="pax-tab ${i === 0 ? 'active' : ''}" id="tab-${i}" onclick="showPanel(${i})">
+                <span class="pax-num">${i+1}</span>
+                <i class="fas fa-check pax-check"></i>
+                ${p.label} ${p.type === 'child' ? '👶' : ''}
+            </div>
+        `).join('');
+    }
+
+    function updateTabs(idx) {
+        passengers.forEach((_, i) => {
+            const t = document.getElementById(`tab-${i}`);
+            if (!t) return;
+            t.classList.remove('active','complete');
+            if (i === idx) t.classList.add('active');
+            else if (paxData[i].seat && paxData[i].photo) t.classList.add('complete');
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PASSENGER PANELS
+    // ═══════════════════════════════════════════════════════
+    function buildPanels() {
+        const container = document.getElementById('paxPanels');
+        container.innerHTML = passengers.map((p, i) => `
+            <div class="pax-panel ${i === 0 ? 'active' : ''}" id="panel-${i}">
+                <div class="pax-panel-inner">
+                    <!-- Left: credentials -->
+                    <div>
+                        <div class="form-section-title"><i class="fas fa-user-shield"></i> ${p.label} Credentials</div>
+
+                        <div class="field-group">
+                            <label>Full Name</label>
+                            <input type="text" class="auth-input" id="name-${i}" placeholder="Full legal name as on passport"
+                                value="${i === 0 ? (currentUser ? currentUser.name : '') : ''}">
+                        </div>
+                        <div class="field-group">
+                            <label>Passport ID / Number</label>
+                            <input type="text" class="auth-input" id="passport-${i}" placeholder="e.g. EP720194A">
+                        </div>
+                        <div class="field-group">
+                            <label>${p.type === 'child' ? 'B-Form / Guardian CNIC' : 'CNIC / National ID'}</label>
+                            <input type="text" class="auth-input" id="cnic-${i}" placeholder="e.g. 35202-XXXXXXX-X">
+                        </div>
+                        <div class="field-group">
+                            <label>Passport Size Photo</label>
+                            <div class="photo-upload-container" id="photoArea-${i}" onclick="document.getElementById('photoInput-${i}').click()" style="padding:1.25rem;">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span id="photoText-${i}" style="font-size:.72rem;color:var(--dark-500);">Click to upload photo</span>
+                                <img id="photoPreview-${i}" class="photo-preview" src="#" style="display:none;">
+                                <input type="file" id="photoInput-${i}" accept="image/*" style="display:none;" onchange="handlePhoto(${i}, this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: seat selection -->
+                    <div>
+                        <div class="seat-section">
+                            <div class="form-section-title"><i class="fas fa-chair"></i> Choose Seat</div>
+                            <div class="seat-map-wrapper">
+                                <div class="seat-legend">
+                                    <div class="legend-item"><div class="legend-color available"></div>Available</div>
+                                    <div class="legend-item"><div class="legend-color selected"></div>Selected</div>
+                                    <div class="legend-item"><div class="legend-color occupied"></div>Occupied</div>
+                                </div>
+                                <div class="seat-grid" id="seatGrid-${i}" style="max-height:260px;"></div>
+                                <div class="selected-seats-info">
+                                    Seat: <span id="seatLabel-${i}" style="font-weight:700;color:var(--success);">None</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation buttons -->
+                <div class="pax-nav">
+                    <button class="btn-pax-prev" ${i === 0 ? 'style="visibility:hidden"' : ''} onclick="showPanel(${i-1})">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn-pax-next" onclick="validateAndNext(${i})">
+                        ${i < passengers.length - 1 ? 'Next Passenger <i class="fas fa-arrow-right"></i>' : 'Review & Pay <i class="fas fa-credit-card"></i>'}
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        // Load seat grids
+        passengers.forEach((_, i) => loadSeatGrid(i));
+    }
+
+    function showPanel(idx) {
+        if (idx < 0 || idx >= passengers.length) return;
+        currentPaxIdx = idx;
+        document.querySelectorAll('.pax-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`panel-${idx}`).classList.add('active');
+        updateTabs(idx);
+        updateProgress(idx);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PHOTO UPLOAD
+    // ═══════════════════════════════════════════════════════
+    function handlePhoto(idx, input) {
+        const file = input.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            paxData[idx].photoB64 = e.target.result;
+            paxData[idx].photo    = e.target.result;
+            const preview = document.getElementById(`photoPreview-${idx}`);
+            const text    = document.getElementById(`photoText-${idx}`);
+            preview.src          = e.target.result;
+            preview.style.display = 'block';
+            text.style.display    = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // SEAT GRID
+    // ═══════════════════════════════════════════════════════
+    function deterministicOccupied(code) {
+        let hash = 0;
+        for (let i = 0; i < code.length; i++) hash = code.charCodeAt(i) + ((hash << 5) - hash);
+        let seed = Math.abs(hash);
+        const occupied = [];
+        for (let r = 1; r <= 8; r++) {
+            ['A','B','C','D','E','F'].forEach(col => {
+                seed = (seed * 9301 + 49297) % 233280;
+                if (seed / 233280 < 0.35) occupied.push(`${r}${col}`);
+            });
+        }
+        return occupied;
+    }
+
+    async function loadSeatGrid(paxIdx) {
+        const grid = document.getElementById(`seatGrid-${paxIdx}`);
+        grid.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--dark-500);"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+        let dbSeats = [];
+        try {
+            const r = await fetch(`api_bookings.php?action=booked_seats&flightCode=${encodeURIComponent(flightCode)}`);
+            const d = await r.json();
+            if (d.status === 'success') dbSeats = d.seats;
+        } catch {}
+
+        // Also block seats already chosen by OTHER passengers in this session
+        const sessionSeats = paxData.filter((_, i) => i !== paxIdx && paxData[i].seat).map(p => p.seat);
+
+        const allOccupied = [...new Set([...dbSeats, ...deterministicOccupied(flightCode), ...sessionSeats])];
+        grid.innerHTML = '';
+
+        for (let r = 1; r <= 8; r++) {
+            const row = document.createElement('div');
+            row.className = 'seat-row';
+            const lbl = document.createElement('div');
+            lbl.className = 'seat-row-label';
+            lbl.textContent = r;
+            row.appendChild(lbl);
+
+            ['A','B','C','','D','E','F'].forEach(col => {
+                if (col === '') {
+                    const sp = document.createElement('div');
+                    sp.className = 'seat-aisle';
+                    row.appendChild(sp);
+                    return;
+                }
+                const seatName = `${r}${col}`;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'seat-btn';
+
+                if (allOccupied.includes(seatName)) {
+                    btn.classList.add('occupied');
+                    btn.textContent = '✖';
+                } else {
+                    btn.classList.add('available');
+                    btn.textContent = seatName;
+                    btn.addEventListener('click', () => {
+                        // Deselect previous
+                        grid.querySelectorAll('.seat-btn.selected').forEach(s => {
+                            s.classList.remove('selected');
+                            s.classList.add('available');
+                        });
+                        paxData[paxIdx].seat = seatName;
+                        btn.classList.replace('available','selected');
+                        document.getElementById(`seatLabel-${paxIdx}`).textContent = seatName;
+                    });
+                }
+                row.appendChild(btn);
+            });
+            grid.appendChild(row);
+        }
+        document.getElementById(`seatLabel-${paxIdx}`).textContent = 'None';
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // VALIDATE & ADVANCE
+    // ═══════════════════════════════════════════════════════
+    function validateAndNext(idx) {
+        const name     = document.getElementById(`name-${idx}`).value.trim();
+        const passport = document.getElementById(`passport-${idx}`).value.trim();
+        const cnic     = document.getElementById(`cnic-${idx}`).value.trim();
+
+        if (!name)          { alert(`Please enter the full name for ${passengers[idx].label}.`); return; }
+        if (!passport)      { alert(`Please enter the Passport ID for ${passengers[idx].label}.`); return; }
+        if (!cnic)          { alert(`Please enter the CNIC / National ID for ${passengers[idx].label}.`); return; }
+        if (!paxData[idx].seat)  { alert(`Please select a seat for ${passengers[idx].label}.`); return; }
+        if (!paxData[idx].photo) { alert(`Please upload a photo for ${passengers[idx].label}.`); return; }
+
+        // Save to state
+        paxData[idx].name     = name;
+        paxData[idx].passport = passport;
+        paxData[idx].cnic     = cnic;
+
+        // Mark tab complete
+        const tab = document.getElementById(`tab-${idx}`);
+        if (tab) { tab.classList.remove('active'); tab.classList.add('complete'); }
+
+        if (idx < passengers.length - 1) {
+            showPanel(idx + 1);
+        } else {
+            openPaymentModal();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // PAYMENT MODAL
+    // ═══════════════════════════════════════════════════════
+    function initPaymentModal() {
+        // Payment method toggle
+        document.querySelectorAll('.pay-method').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.pay-method').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedPayMethod = btn.dataset.method;
+                document.getElementById('cardFields').classList.toggle('visible', selectedPayMethod === 'card');
+            });
+        });
+
+        // Card number formatting
+        document.getElementById('cardNumber').addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19);
+        });
+        document.getElementById('cardExpiry').addEventListener('input', e => {
+            let v = e.target.value.replace(/\D/g,'');
+            if (v.length >= 2) v = v.slice(0,2) + ' / ' + v.slice(2,4);
+            e.target.value = v;
+        });
+
+        document.getElementById('btnConfirmPayment').addEventListener('click', processPayment);
+        document.getElementById('paymentModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('paymentModal')) closePaymentModal();
+        });
+    }
+
+    function openPaymentModal() {
+        // Build order summary
+        const numericPrice = parseFloat((flightPrice || '$0').replace(/[^0-9.]/g,'')) || 0;
+        const total = (numericPrice * passengers.length).toFixed(2);
+
+        document.getElementById('orderSummary').innerHTML = `
+            <div class="order-row"><span>Route</span><strong>${routeName}</strong></div>
+            <div class="order-row"><span>Flight</span><strong>${flightCode}</strong></div>
+            <div class="order-row"><span>Class</span><strong>${cabinClass.charAt(0).toUpperCase()+cabinClass.slice(1)}</strong></div>
+            <div class="order-row"><span>Date</span><strong>${depDate || '—'}</strong></div>
+            ${passengers.map((p, i) => `
+                <div class="order-row"><span>${p.label} — Seat ${paxData[i].seat}</span><strong>${flightPrice}</strong></div>
+            `).join('')}
+            <div class="order-row total"><span>Total</span><strong>$${total}</strong></div>
+        `;
+
+        document.getElementById('btnPayLabel').textContent = `Confirm & Pay $${total}`;
+        document.getElementById('paymentModal').classList.add('visible');
+        updateProgress(passengers.length); // payment step
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.remove('visible');
+    }
+
+    async function processPayment() {
+        if (selectedPayMethod === 'card') {
+            const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+            const exp = document.getElementById('cardExpiry').value;
+            const cvv = document.getElementById('cardCvv').value;
+            if (num.length < 16) { alert('Please enter a valid 16-digit card number.'); return; }
+            if (!exp.includes('/'))  { alert('Please enter card expiry.'); return; }
+            if (cvv.length < 3)      { alert('Please enter CVV.'); return; }
+        }
+
+        closePaymentModal();
+        showLoader('Confirming your booking...');
+
+        const pnr        = 'DN' + Math.random().toString(36).substring(2,8).toUpperCase();
+        const numericPrice = parseFloat((flightPrice || '$0').replace(/[^0-9.]/g,'')) || 0;
+        const totalPrice = '$' + (numericPrice * passengers.length).toFixed(2);
+
+        const bookingPayload = {
+            action:        'save',
+            pnr,
+            flightCode,
+            route:         routeName,
+            cabinClass,
+            totalPrice,
+            bookingDate:   depDate || new Date().toLocaleDateString(),
+            paymentMethod: selectedPayMethod,
+            userEmail:     currentUser?.email || '', 
+            passengers:    paxData.map((p, i) => ({
+                type:     passengers[i].type,
+                name:     p.name,
+                passport: p.passport,
+                cnic:     p.cnic,
+                seat:     p.seat,
+                photo:    p.photo,
+            })),
+        };
+
+        try {
+            const r = await fetch('api_bookings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingPayload),
+            });
+            const d = await r.json();
+            hideLoader();
+
+            if (d.status === 'success') {
+                buildTickets(pnr);
+                document.getElementById('ticketsOverlay').classList.add('visible');
+
+                // ── Send e-ticket email ──────────────────────────────────
+                const meta = window._flightMeta || {};
+                const emailPayload = {
+                    toEmail:       currentUser?.email || bookingPayload.userEmail || '',
+                    passengerName: paxData[0]?.name || '',
+                    pnr,
+                    flightCode,
+                    route:         routeName,
+                    cabinClass,
+                    totalPrice:    bookingPayload.totalPrice,
+                    fare:          bookingPayload.totalPrice,
+                    bookingDate:   bookingPayload.bookingDate,
+                    duration:      meta.duration      || '',
+                    departureTime: meta.departure_time || '',
+                    paymentMethod: selectedPayMethod,
+                    passengers:    paxData.map((p, i) => ({
+                        name: p.name,
+                        seat: p.seat,
+                        type: passengers[i]?.type || 'adult',
+                    })),
+                };
+                fetch('send_ticket_email.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(emailPayload),
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        console.log('E-ticket email sent to', emailPayload.toEmail);
+                    } else {
+                        console.warn('Email failed:', res.message);
+                    }
+                })
+                .catch(err => console.warn('Email request error:', err));
+            } else {
+                alert(d.message);
+            }
+        } catch (err) {
+            hideLoader();
+            alert('Booking failed. Please check your connection.');
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // E-TICKET CAROUSEL
+    // ═══════════════════════════════════════════════════════
+    let currentTicket = 0;
+
+    function buildTickets(pnr) {
+        const slides = document.getElementById('ticketSlides');
+        const dots   = document.getElementById('carouselDots');
+        slides.innerHTML = '';
+        dots.innerHTML   = '';
+
+        paxData.forEach((p, i) => {
+            const typeLabel = passengers[i].type === 'child' ? 'Child' : 'Adult';
+            const slide = document.createElement('div');
+            slide.className = `ticket-slide ${i === 0 ? 'active' : ''}`;
+            slide.innerHTML = `
+                <div class="e-ticket">
+                    <div class="e-ticket-header">
+                        <div>
+                            <h3>Danoria Airways</h3>
+                            <p>Official E-Ticket &amp; Boarding Pass</p>
+                        </div>
+                        <div class="e-ticket-pnr">${pnr}</div>
+                    </div>
+                    <div class="e-ticket-body">
+                        <div class="e-ticket-row">
+                            <div class="e-ticket-field">
+                                <div class="e-ticket-lbl">Passenger</div>
+                                <div class="e-ticket-val">${p.name}</div>
+                            </div>
+                            <div class="e-ticket-field" style="text-align:right;">
+                                <div class="e-ticket-lbl">Type</div>
+                                <div class="e-ticket-val">
+                                    <span class="e-ticket-type-badge badge-${passengers[i].type}">${typeLabel}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="e-ticket-row">
+                            <div class="e-ticket-field">
+                                <div class="e-ticket-lbl">Route</div>
+                                <div class="e-ticket-val">${routeName}</div>
+                            </div>
+                        </div>
+                        <div class="e-ticket-row">
+                            <div class="e-ticket-field">
+                                <div class="e-ticket-lbl">Flight</div>
+                                <div class="e-ticket-val">${flightCode}</div>
+                            </div>
+                            <div class="e-ticket-field">
+                                <div class="e-ticket-lbl">Class</div>
+                                <div class="e-ticket-val">${cabinClass.charAt(0).toUpperCase()+cabinClass.slice(1)}</div>
+                            </div>
+                            <div class="e-ticket-field" style="text-align:right;">
+                                <div class="e-ticket-lbl">Seat</div>
+                                <div class="e-ticket-val seat">${p.seat}</div>
+                            </div>
+                        </div>
+                        <div class="e-ticket-row">
+                            <div class="e-ticket-field">
+                                <div class="e-ticket-lbl">Date</div>
+                                <div class="e-ticket-val">${depDate || '—'}</div>
+                            </div>
+                            <div class="e-ticket-field">
+                                <div class="e-ticket-lbl">Passport</div>
+                                <div class="e-ticket-val">${p.passport}</div>
+                            </div>
+                            <div class="e-ticket-field" style="text-align:right;">
+                                <div class="e-ticket-lbl">Status</div>
+                                <div class="e-ticket-val"><span class="e-ticket-stamp">Approved</span></div>
+                            </div>
+                        </div>
+                        <div class="e-ticket-divider"></div>
+                        <div class="e-ticket-barcode">
+                            <div class="barcode-bars"></div>
+                            <div class="barcode-num">*${pnr}-P${i+1}*</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            slides.appendChild(slide);
+
+            const dot = document.createElement('div');
+            dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+            dot.addEventListener('click', () => goToTicket(i));
+            dots.appendChild(dot);
+        });
+
+        if (paxData.length > 1) {
+            document.getElementById('carouselNav').style.display = 'flex';
+        }
+        currentTicket = 0;
+    }
+
+    function initTicketCarousel() {
+        document.getElementById('prevTicket').addEventListener('click', () => goToTicket(currentTicket - 1));
+        document.getElementById('nextTicket').addEventListener('click', () => goToTicket(currentTicket + 1));
+        document.getElementById('btnPrintTicket').addEventListener('click', () => window.print());
+        document.getElementById('btnTicketHome').addEventListener('click', () => window.location.href = 'index.html');
+    }
+
+    function goToTicket(idx) {
+        const slides = document.querySelectorAll('.ticket-slide');
+        const dots   = document.querySelectorAll('.carousel-dot');
+        if (idx < 0 || idx >= slides.length) return;
+        slides[currentTicket].classList.remove('active');
+        dots[currentTicket].classList.remove('active');
+        currentTicket = idx;
+        slides[currentTicket].classList.add('active');
+        dots[currentTicket].classList.add('active');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // LOADER
+    // ═══════════════════════════════════════════════════════
+    function showLoader(msg) {
+        document.getElementById('loaderMsg').textContent = msg || 'Processing...';
+        document.getElementById('pageLoader').classList.add('visible');
+    }
+    function hideLoader() {
+        document.getElementById('pageLoader').classList.remove('visible');
+    }
+    </script>
+</body>
+</html>

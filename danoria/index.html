@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danoria - Flight Booking & 3D Globe Experience</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" 
+    rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Restructured Stylesheet link -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-globe">
+                <div class="loader-ring"></div>
+                <div class="loader-ring loader-ring-2"></div>
+                <div class="loader-ring loader-ring-3"></div>
+            </div>
+            <h2>Danoria</h2>
+            <p>Mapping your next adventure...</p>
+            <div class="loader-bar">
+                <div class="loader-progress" id="loaderProgress"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Authentication Modal -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Welcome to Danoria</h2>
+                <p>Sign in to track your journey</p>
+            </div>
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin">Log In</div>
+                <div class="auth-tab" id="tabRegister">Register</div>
+            </div>
+            <form class="auth-form" id="authForm">
+    <div id="nameField" style="display:none;">
+        <input type="text" id="authName" class="auth-input" placeholder="Full Name">
+    </div>
+    <input type="email" id="authEmail" class="auth-input" placeholder="Email Address" required>
+    <input type="password" id="authPassword" class="auth-input" placeholder="Password" required>
+    <button type="submit" class="btn-auth" id="authSubmitBtn">Log In</button>
+</form>
+            <div class="auth-footer" id="authFooter">
+                Don't have an account? <a id="toggleAuth">Register</a>
+            </div>
+        </div>
+    </div>
+    <!-- Booking Confirmation Modal with Passenger Identity & Seats -->
+    <div class="booking-modal" id="bookingModal">
+        <div class="booking-content">
+            <button class="booking-close" id="closeBooking"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:1.25rem; font-family:var(--font-display); font-size:1.6rem; color:var(--white);">Confirm Booking</h3>
+            
+            <!-- Flight Route Details Summary -->
+            <div class="flight-summary" id="bookingFlightSummary">
+                <!-- Loaded dynamically -->
+            </div>
+            <!-- Seat Map Selection -->
+            <div class="seat-selection-container">
+                <h4><i class="fas fa-chair"></i> Select Your Seat</h4>
+                <div class="seat-map-wrapper">
+                    <div class="seat-legend">
+                        <div class="legend-item"><div class="legend-color available"></div>Available</div>
+                        <div class="legend-item"><div class="legend-color selected"></div>Selected</div>
+                        <div class="legend-item"><div class="legend-color occupied"></div>Occupied</div>
+                    </div>
+                    <div class="seat-grid" id="seatGrid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                    <div class="selected-seats-info">
+                        Selected Seat: <span id="selectedSeatNumber" style="font-weight:700; color:var(--success);">None</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Passenger Identity Fields -->
+            <div class="passenger-form-section">
+                <h4><i class="fas fa-user-shield"></i> Passenger Credentials</h4>
+                
+                <div class="form-row">
+                    <div class="booking-input-group">
+                        <label>Passenger Full Name</label>
+                        <input type="text" class="auth-input" id="passengerName" placeholder="John Doe">
+                    </div>
+                    <div class="booking-input-group">
+                        <label>Passport ID / Number</label>
+                        <input type="text" class="auth-input" id="passportId" placeholder="e.g. EP720194A">
+                    </div>
+                </div>
+                <div class="form-row" style="align-items: center; margin-top: .5rem;">
+                    <div class="booking-input-group">
+                        <label>CNIC / National ID</label>
+                        <input type="text" class="auth-input" id="cnicId" placeholder="e.g. 35202-XXXXXXX-X">
+                    </div>
+                    <!-- Photo Upload File drag -->
+                    <div class="booking-input-group">
+                        <label>Passport Size Photo</label>
+                        <div class="photo-upload-container" id="photoUploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span id="uploadPlaceholderText" style="font-size: 0.72rem; color: var(--dark-500);">Upload Image</span>
+                            <img id="photoPreview" class="photo-preview" src="#" alt="Passenger photo preview">
+                            <input type="file" id="photoFileInput" accept="image/*" style="display:none;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="booking-input-group" style="margin-top: .5rem;">
+                    <label>Send E-Ticket Confirmation to</label>
+                    <input type="email" class="auth-input" id="bookingEmail" placeholder="traveler@example.com">
+                </div>
+            </div>
+            <!-- Booking Confirm -->
+            <button class="btn-confirm-booking" id="confirmBookingBtn">
+                <span>Confirm & Send Ticket</span> <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    <!-- My Bookings History Modal -->
+    <div class="bookings-modal" id="myBookingsModal">
+        <div class="bookings-content">
+            <button class="booking-close" id="closeMyBookings"><i class="fas fa-times"></i></button>
+            <h3 style="font-family:var(--font-display); font-size:1.6rem; color:var(--white); margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.5rem;"><i class="fas fa-ticket-alt"></i> My Booking History</h3>
+            <div class="bookings-list" id="myBookingsList">
+                <!-- Dynamically loaded tickets -->
+            </div>
+        </div>
+    </div>
+    <!-- Sticky Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <span class="logo-icon">✈</span>
+                <span class="logo-text">Danoria</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#destinations">Destinations</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#book">Book</a></li>
+                <li><a href="#footer">Contact</a></li>
+            </ul>
+            <div class="nav-actions" id="navActions">
+                <span id="userGreeting" style="font-size:0.9rem; color:var(--dark-500); display:none; font-weight:500;"></span>
+                <button class="btn-nav-bookings" id="btnMyBookings" style="display:none;"><i class="fas fa-ticket-alt"></i> My Bookings</button>
+                <button class="btn-nav" id="btnLogout" style="display:none;">Log Out</button>
+                <a href="#book" class="btn-primary" id="navActionsBookBtn">Book Now</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+    <!-- Hero Section with ThreeJS globe view -->
+    <section class="hero" id="hero">
+        <div class="hero-bg" id="heroBg"></div>
+        <canvas id="globeCanvas"></canvas>
+        
+        <!-- Controls floating on Canvas -->
+        <div class="lighting-controls">
+            <button class="lighting-btn" id="dayNightToggle" title="Toggle Day/Night">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </button>
+            <div class="zoom-controls">
+                <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
+                <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
+            </div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-text" id="heroText">
+                <span class="hero-badge"><i class="fas fa-circle"></i> Live 3D Globe Experience</span>
+                <h1 class="hero-title">
+                    <span class="title-line">Where</span>
+                    <span class="title-line accent">Adventure</span>
+                    <span class="title-line">Awaits</span>
+                </h1>
+                <p class="hero-subtitle">Rotate the globe, select your departure and arrival countries, and watch your animated flight routes come alive in real-time 3D.</p>
+                <div class="hero-cta">
+                    <button class="btn-hero-primary" id="exploreBtn"><span>Explore Globe</span><i class="fas fa-globe-americas"></i></button>
+                    <a href="#book" class="btn-hero-secondary"><i class="fas fa-ticket-alt"></i> Book a Flight</a>
+                </div>
+            </div>
+            <!-- Country Selection Widgets and Dynamic Side Panels -->
+            <div class="country-selector" id="countrySelector">
+                <div class="selector-header">
+                    <h3><i class="fas fa-map-marker-alt"></i> Flight Destination</h3>
+                    <span class="selected-country" id="selectedCountry">Hover the globe</span>
+                </div>
+                
+                <!-- Departure/Arrival Tabs -->
+                <div class="selector-tabs">
+                    <button class="selector-tab-btn active" id="tabDepartureBtn" data-tab="departure">Departure</button>
+                    <button class="selector-tab-btn" id="tabArrivalBtn" data-tab="arrival">Arrival</button>
+                </div>
+                
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search countries..." id="destinationSearch">
+                </div>
+                
+                <!-- The 15 Countries Grid -->
+                <div class="country-grid" id="countryGrid">
+                    <!-- Populated dynamically by app.js -->
+                </div>
+                <!-- Country Beauty Sidebar Panel (Shows Nature, Eco, Architecture & Hotels) -->
+                <div class="beauty-panel" id="beautyPanel">
+                    <div class="beauty-tab-container">
+                        <button class="beauty-tab-btn active" data-type="nature">Nature</button>
+                        <button class="beauty-tab-btn" data-type="ecosystem">Ecosystem</button>
+                        <button class="beauty-tab-btn" data-type="architecture">Architecture</button>
+                    </div>
+                    <div class="beauty-tab-content">
+                        <p id="beautyText">Select a country to view highlights.</p>
+                    </div>
+                    <!-- Beauty Images Grid -->
+                    <div class="beauty-images-grid" id="beautyImagesGrid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                    <!-- Hotels Info list -->
+                    <div style="margin-top: .5rem;">
+                        <h5 style="font-size: .8rem; text-transform: uppercase; color: var(--dark-500); margin-bottom: .25rem; letter-spacing: 1px;">Recommended Hotels</h5>
+                        <div class="hotel-list" id="hotelList">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Available Flight Routes results list -->
+                <div class="flight-info" id="flightInfo">
+                    <div class="flight-info-header">
+                        <h4><i class="fas fa-plane"></i> Available Flights</h4>
+                        <span id="flightCount" style="font-size:.75rem; color:var(--primary);"></span>
+                    </div>
+                    <div id="flightList">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+                <!-- Stats Footer Panel -->
+                <div class="quick-stats" id="quickStats">
+                    <div class="stat"><span class="stat-number" id="statCountries">0</span><span class="stat-label">Countries</span></div>
+                    <div class="stat"><span class="stat-number" id="statFlights">0</span><span class="stat-label">Daily Flights</span></div>
+                    <div class="stat"><span class="stat-number" id="statHappy">0</span><span class="stat-label">Travelers</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator" id="scrollIndicator">
+            <span>Scroll to explore</span>
+            <div class="scroll-arrow"><i class="fas fa-chevron-down"></i></div>
+        </div>
+    </section>
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-tag">Why Danoria</span>
+                <h2>Experience Travel Differently</h2>
+                <p>A visual-first approach to discovering and booking your next trip</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-globe"></i></div>
+                    <h3>Interactive 3D Globe</h3>
+                    <p>Rotate, zoom, and explore a real textured globe. Click any marker to set routing paths.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-route"></i></div>
+                    <h3>Dynamic Routes</h3>
+                    <p>Watch your flight path arc across the globe in real-time between your origin and destination.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Instant Booking</h3>
+                    <p>Select seats, upload credentials, and secure boarding tickets dynamically in 60 seconds.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-users"></i></div>
+                    <h3>Passenger Portals</h3>
+                    <p>Verify passports, identities, and national IDs directly in our synchronized client database.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+                    <h3>Eco Score</h3>
+                    <p>Every flight displays carbon parameters. Track eco factors and select greener routing easily.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                    <h3>AI Recommendations</h3>
+                    <p>Our intelligent state model checks patterns to suggest pristine hotel listings automatically.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Destinations Section -->
+    <section class="destinations" id="destinations">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-tag">Popular</span>
+                <h2>Where Will You Go Next?</h2>
+            </div>
+            <div class="destinations-carousel">
+                <div class="destination-card large fade-in" data-dest="japan">
+                    <div class="destination-bg" style="background:linear-gradient(to bottom, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&q=80') no-repeat center/cover"></div>
+                    <div class="destination-content">
+                        <span class="destination-tag">Trending</span>
+                        <h3>Tokyo, Japan</h3>
+                        <p>Ancient temples meet neon skylines. From Shibuya to Mount Fuji, every moment is cinematic.</p>
+                        <div class="destination-meta">
+                            <span><strong>24°C</strong> Weather</span>
+                            <span><strong>14h</strong> Direct</span>
+                            <span><strong>4.9</strong> ★</span>
+                        </div>
+                        <button class="btn-destination" onclick="openCountryPage(this.closest('[data-dest]').dataset.dest)">Explore <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="destination-card fade-in" data-dest="canada">
+                    <div class="destination-bg" style="background:linear-gradient(to bottom, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1489447068241-b3490214e879?w=800&q=80') no-repeat center/cover"></div>
+                    <div class="destination-content">
+                        <span class="destination-tag">Nature</span>
+                        <h3>Toronto, Canada</h3>
+                        <p>The iconic CN Tower and vast northern landscapes.</p>
+                        <div class="destination-meta">
+                            <span><strong>18°C</strong> Weather</span>
+                            <span><strong>2h</strong> Direct</span>
+                            <span><strong>4.8</strong> ★</span>
+                        </div>
+                        <button class="btn-destination" onclick="openCountryPage(this.closest('[data-dest]').dataset.dest)">Explore <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="destination-card fade-in" data-dest="egypt">
+                    <div class="destination-bg" style="background:linear-gradient(to bottom, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800&q=80') no-repeat center/cover"></div>
+                    <div class="destination-content">
+                        <span class="destination-tag">History</span>
+                        <h3>Cairo, Egypt</h3>
+                        <p>The Pyramids of Giza. Ancient art, history, and Nile rivers.</p>
+                        <div class="destination-meta">
+                            <span><strong>30°C</strong> Weather</span>
+                            <span><strong>9h</strong> Direct</span>
+                            <span><strong>4.9</strong> ★</span>
+                        </div>
+                        <button class="btn-destination" onclick="openCountryPage(this.closest('[data-dest]').dataset.dest)">Explore <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="destination-card fade-in" data-dest="thailand">
+                    <div class="destination-bg" style="background:linear-gradient(to bottom, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80') no-repeat center/cover"></div>
+                    <div class="destination-content">
+                        <span class="destination-tag">Tropical</span>
+                        <h3>Bangkok, Thailand</h3>
+                        <p>Vibrant street life, ornate temples, and golden beaches.</p>
+                        <div class="destination-meta">
+                            <span><strong>31°C</strong> Weather</span>
+                            <span><strong>12h</strong> Direct</span>
+                            <span><strong>4.7</strong> ★</span>
+                        </div>
+                        <button class="btn-destination" onclick="openCountryPage(this.closest('[data-dest]').dataset.dest)">Explore <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="destination-card fade-in" data-dest="maldives">
+                    <div class="destination-bg" style="background:linear-gradient(to bottom, rgba(15, 23, 42, 0.15), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80') no-repeat center/cover"></div>
+                    <div class="destination-content">
+                        <span class="destination-tag">Tropical</span>
+                        <h3>Malé, Maldives</h3>
+                        <p>Crystal lagoons and overwater luxury villas.</p>
+                        <div class="destination-meta">
+                            <span><strong>28°C</strong> Weather</span>
+                            <span><strong>4h</strong> Direct</span>
+                            <span><strong>4.8</strong> ★</span>
+                        </div>
+                        <button class="btn-destination" onclick="openCountryPage(this.closest('[data-dest]').dataset.dest)">Explore <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Booking Form Section -->
+    <section class="booking-section" id="book">
+        <div class="container">
+            <div class="booking-wrapper fade-in">
+                <div class="booking-content">
+                    <span class="section-tag">Book Now</span>
+                    <h2>Start Your Adventure</h2>
+                    <p>Select your origin and destination countries. Confirm flight timings and book secure tickets.</p>
+                    <div class="booking-perks">
+                        <div class="perk"><i class="fas fa-shield-alt"></i><span>Free Cancellation</span></div>
+                        <div class="perk"><i class="fas fa-tag"></i><span>Best Price Guarantee</span></div>
+                        <div class="perk"><i class="fas fa-headset"></i><span>24/7 Support</span></div>
+                    </div>
+                </div>
+                <!-- Dynamic Dropdowns booking form -->
+                <form class="booking-form" id="bookingForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-plane-departure"></i> From Country</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <select id="fromCountrySelect" required>
+                                    <option value="">Choose Origin...</option>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-plane-arrival"></i> To Country</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-globe-americas"></i>
+                                <select id="toCountrySelect" required>
+                                    <option value="">Choose Destination...</option>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Departure Date</label>
+                            <input type="date" id="departureDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-check"></i> Return Date</label>
+                            <input type="date" id="returnDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-users"></i> Passengers</label>
+                            <select id="passengers">
+                                <option value="1 Adult">1 Adult</option>
+                                <option value="2 Adults">2 Adults</option>
+                                <option value="2 Adults 1 Child">2 Adults, 1 Child</option>
+                                <option value="2 Adults 2 Children">2 Adults, 2 Children</option>
+                                <option value="1 Adult 1 Child">1 Adult, 1 Child</option>
+                                <option value="4 Adults">Family (4 Adults)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-class">
+                        <span class="class-label">Cabin Class:</span>
+                        <div class="class-options">
+                            <label class="class-option">
+                                <input type="radio" name="flightClass" value="economy" checked>
+                                <span>Economy</span>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="flightClass" value="business">
+                                <span>Business</span>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="flightClass" value="first">
+                                <span>First</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-search" id="btnSearch"><i class="fas fa-search"></i> Search Flights</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="logo-icon">✈</span>
+                        <span class="logo-text">Danoria</span>
+                    </a>
+                    <p>Where adventure awaits. Explore the world in 3D and book flights visually.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <a href="#">Destinations</a>
+                    <a href="#">Experiences</a>
+                    <a href="#">Deals</a>
+                    <a href="#">Travel Guides</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                    <a href="#">Partners</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Danoria. All rights reserved. Crafted with ✈️ for explorers.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- CDNs: Three.js, GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Restructured Modulized Javascript Links -->
+    <script src="globe.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

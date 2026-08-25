@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Danoria — Destination</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body class="country-page">
+
+<a href="javascript:window.close()" class="cp-back-btn"><i class="fas fa-arrow-left"></i> Back to Globe</a>
+
+<!-- HERO -->
+<div class="cp-hero" id="cpHero">
+  <div class="cp-hero-bg" id="cpHeroBg"></div>
+  <div class="cp-hero-overlay"></div>
+  <div class="cp-hero-content">
+    <div class="cp-flag" id="cpFlag"></div>
+    <div class="cp-country-name" id="cpName2"></div>
+    <div class="cp-tagline" id="cpTagline"></div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="cp-body">
+
+  <!-- STATS -->
+  <div class="cp-stats" id="cpStats"></div>
+
+  <!-- TABS -->
+  <div class="cp-tabs" id="cpTabsBar">
+    <button class="cp-tab active" data-tab="nature">🌿 Nature</button>
+    <button class="cp-tab" data-tab="ecosystem">🦁 Ecosystem</button>
+    <button class="cp-tab" data-tab="architecture">🏛️ Architecture</button>
+    <button class="cp-tab" data-tab="itinerary">🗓️ Itinerary</button>
+    <button class="cp-tab" data-tab="hotels">🏨 Hotels</button>
+    <button class="cp-tab" data-tab="expenses">💰 Expenses</button>
+  </div>
+
+  <!-- NATURE TAB -->
+  <div class="cp-tab-content active" id="tab-nature">
+    <div class="cp-images-grid" id="naturImgs"></div>
+    <p class="cp-desc" id="natureDesc"></p>
+  </div>
+
+  <!-- ECOSYSTEM TAB -->
+  <div class="cp-tab-content" id="tab-ecosystem">
+    <div class="cp-images-grid" id="ecoImgs"></div>
+    <p class="cp-desc" id="ecoDesc"></p>
+  </div>
+
+  <!-- ARCHITECTURE TAB -->
+  <div class="cp-tab-content" id="tab-architecture">
+    <div class="cp-images-grid" id="archImgs"></div>
+    <p class="cp-desc" id="archDesc"></p>
+  </div>
+
+  <!-- ITINERARY TAB -->
+  <div class="cp-tab-content" id="tab-itinerary">
+    <h2 class="cp-section-title"><i class="fas fa-route"></i> Ideal Travel Plan</h2>
+    <div class="cp-itinerary" id="cpItinerary"></div>
+  </div>
+
+  <!-- HOTELS TAB -->
+  <div class="cp-tab-content" id="tab-hotels">
+    <h2 class="cp-section-title"><i class="fas fa-hotel"></i> Recommended Hotels</h2>
+    <div class="cp-card-grid" id="cpHotels"></div>
+  </div>
+
+  <!-- EXPENSES TAB -->
+  <div class="cp-tab-content" id="tab-expenses">
+    <h2 class="cp-section-title"><i class="fas fa-wallet"></i> Travel Budget Planner</h2>
+    <table class="cp-expense-table" id="cpExpenses">
+      <thead><tr><th>Category</th><th>Details</th><th>Est. Cost</th></tr></thead>
+      <tbody id="cpExpenseBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- STICKY BOOK STRIP -->
+<div class="cp-book-strip" id="cpBookStrip">
+  <div class="cp-book-strip-info">
+    <span class="cp-book-strip-from">Direct flights available from your city</span>
+    <span class="cp-book-strip-price" id="cpStripPrice"></span>
+  </div>
+  <button class="cp-book-btn" id="cpBookBtnMain"><i class="fas fa-ticket-alt"></i> Book This Trip</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// ALL 15 COUNTRIES — FULL DATA
+// ═══════════════════════════════════════
+const cpData = {
+  pakistan: {
+    name:'Pakistan', flag:'🇵🇰', price:'From $499',
+    tagline:'Land of K2, ancient civilizations & breathtaking valleys',
+    hero:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=80',
+    stats:{ Season:'Apr–Oct', Temp:'15–35°C', Currency:'PKR', Language:'Urdu / English' },
+    beauty:{
+      nature:{ desc:'Home to K2 (world\'s 2nd highest peak), the serene Hunza Valley, fairy meadows of Nanga Parbat, and the crystal Saif-ul-Muluk lake — Pakistan\'s north is one of Earth\'s most dramatic landscapes.',
+        imgs:[
+          {url:'https://images.unsplash.com/photo-1627856013091-fed6e4e30025?w=600&q=80',label:'K2 Base Camp'},
+          {url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',label:'Hunza Valley'},
+          {url:'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80',label:'Fairy Meadows'},
+          {url:'https://images.unsplash.com/photo-1534008757030-27299c4371b6?w=600&q=80',label:'Saiful Muluk Lake'}
+        ]},
+      ecosystem:{ desc:'Pakistan\'s ecosystem ranges from coastal mangroves of Sindh and dry deciduous forests of Punjab, all the way to alpine snow leopard territories in the Karakoram. The Indus Delta is a vital wetland hosting migratory birds.',
+        imgs:[
+          {url:'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80',label:'Himalayan Wildlife'},
+          {url:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80',label:'Forest Ecosystem'}
+        ]},
+      architecture:{ desc:'From the 5,000-year-old ruins of Mohenjo-daro and the Indus Valley Civilization to the iconic Mughal-era Badshahi Mosque and the modernist Faisal Mosque — Pakistan is an architectural time capsule.',
+        imgs:[
+          {url:'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=600&q=80',label:'Faisal Mosque'},
+          {url:'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80',label:'Badshahi Mosque'}
+        ]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Lahore — Culture & Cuisine', desc:'Badshahi Mosque, Lahore Fort, Walled City bazaars, and the legendary Food Street near the Fort.'},
+      {day:'3–4', title:'Islamabad & Rawalpindi', desc:'Faisal Mosque, Pakistan Monument, Taxila Museum with ancient Gandhara Buddhist art.'},
+      {day:'5–6', title:'Hunza Valley', desc:'Drive the Karakoram Highway, visit Attabad Lake, Baltit Fort, and watch sunrise over Rakaposhi.'},
+      {day:'7–8', title:'Skardu & K2 Views', desc:'Fly to Skardu, trek toward Concordia to witness K2 and the Trango Towers up close.'},
+    ],
+    hotels:[
+      {name:'Serena Hotel',city:'Islamabad',rating:'5.0 ★',price:'~$150/night'},
+      {name:'Pearl Continental',city:'Lahore',rating:'4.8 ★',price:'~$120/night'},
+      {name:'Hunza Serena Inn',city:'Hunza',rating:'4.7 ★',price:'~$80/night'},
+      {name:'Avari Towers',city:'Karachi',rating:'4.7 ★',price:'~$110/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'ISB–DXB, ISB–LHR routes',cost:'$499–$900'},
+      {cat:'Hotels (7 nights)',icon:'fa-bed',det:'Mid-range to luxury',cost:'$400–$1,200'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Local restaurants',cost:'$8–$25/day'},
+      {cat:'Transport',icon:'fa-car',det:'Intercity + local',cost:'$80–$200'},
+      {cat:'Activities',icon:'fa-hiking',det:'Treks, sightseeing',cost:'$50–$150'},
+      {cat:'TOTAL (8 days)',icon:'fa-calculator',det:'',cost:'$1,200–$2,800',total:true},
+    ],
+    flights:['DN101 ISB→DXB 09:30','DN102 ISB→LHR 14:00','DN103 ISB→JFK 22:15'],
+  },
+  usa: {
+    name:'United States', flag:'🇺🇸', price:'From $299',
+    tagline:'From New York skylines to Grand Canyon sunsets',
+    hero:'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1400&q=80',
+    stats:{ Season:'Year-round', Temp:'-10–38°C', Currency:'USD', Language:'English' },
+    beauty:{
+      nature:{ desc:'The USA\'s natural wonders are unparalleled — the Grand Canyon, Yellowstone geysers, Niagara Falls, the giant Sequoias of California, and the pristine Alaskan wilderness.', imgs:[
+        {url:'https://images.unsplash.com/photo-1474044159687-1ee9f3a51722?w=600&q=80',label:'Grand Canyon'},
+        {url:'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=600&q=80',label:'Yellowstone'},
+        {url:'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&q=80',label:'New York City'},
+        {url:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80',label:'Alaska'},
+      ]},
+      ecosystem:{ desc:'From Alaskan tundra and Pacific rainforests to Florida\'s Everglades and Sonoran Desert — the USA has the most biologically diverse terrain in the Northern Hemisphere.',imgs:[{url:'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=80',label:'Everglades'}]},
+      architecture:{ desc:'New York\'s iconic glass towers, Chicago\'s Loop architecture, the White House, the Gothic Washington National Cathedral, and Frank Lloyd Wright\'s organic masterpieces.',imgs:[{url:'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&q=80',label:'NYC Skyline'},{url:'https://images.unsplash.com/photo-1501466044931-62695aada8e9?w=600&q=80',label:'Capitol Building'}]}
+    },
+    itinerary:[
+      {day:'1–3', title:'New York City', desc:'Statue of Liberty, Times Square, Central Park, MoMA, Brooklyn Bridge, Empire State Building.'},
+      {day:'4–5', title:'Washington D.C.', desc:'The White House, Smithsonian Museums, Lincoln Memorial, and the National Mall.'},
+      {day:'6–7', title:'Los Angeles & Hollywood', desc:'Walk of Fame, Griffith Observatory, Santa Monica Pier, and a Universal Studios tour.'},
+      {day:'8', title:'Grand Canyon Day Trip', desc:'Fly to Phoenix and take a sunrise tour of the South Rim of the Grand Canyon.'},
+    ],
+    hotels:[
+      {name:'The Plaza Hotel',city:'New York',rating:'4.9 ★',price:'~$700/night'},
+      {name:'The Hay-Adams',city:'Washington D.C.',rating:'4.9 ★',price:'~$450/night'},
+      {name:'Beverly Hills Hotel',city:'Los Angeles',rating:'4.9 ★',price:'~$600/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'International routes',cost:'$299–$900'},
+      {cat:'Hotels (7 nights)',icon:'fa-bed',det:'Mid to luxury',cost:'$700–$3,500'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Restaurants',cost:'$30–$80/day'},
+      {cat:'Internal Flights',icon:'fa-plane',det:'NYC–LAX etc.',cost:'$100–$300'},
+      {cat:'Attractions',icon:'fa-ticket-alt',det:'Entry fees & tours',cost:'$100–$250'},
+      {cat:'TOTAL (8 days)',icon:'fa-calculator',det:'',cost:'$2,000–$6,000',total:true},
+    ],
+    flights:['DN201 JFK→LHR 08:30','DN202 JFK→IST 12:45','DN203 JFK→NRT 21:00'],
+  },
+  canada: {
+    name:'Canada', flag:'🇨🇦', price:'From $350',
+    tagline:'Rocky Mountains, Niagara Falls & Northern Lights',
+    hero:'https://images.unsplash.com/photo-1535569594982-fb4b6b5b9c7e?w=1400&q=80',
+    stats:{ Season:'May–Sep', Temp:'-20–30°C', Currency:'CAD', Language:'English / French' },
+    beauty:{
+      nature:{ desc:'Canada\'s Banff National Park, Lake Louise, the Rockies, Niagara Falls, and the Northern Lights of Yukon are among the world\'s greatest natural spectacles.', imgs:[
+        {url:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80',label:'Banff National Park'},
+        {url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',label:'Rocky Mountains'},
+        {url:'https://images.unsplash.com/photo-1489447068241-b3490214e879?w=600&q=80',label:'Toronto CN Tower'},
+      ]},
+      ecosystem:{ desc:'Canada\'s boreal forest is the world\'s largest intact forest ecosystem. Home to grizzly bears, moose, bald eagles, and beluga whales along its Pacific and Arctic coasts.', imgs:[{url:'https://images.unsplash.com/photo-1443632864897-14973fa006cf?w=600&q=80',label:'Wildlife'}]},
+      architecture:{ desc:'The modernist CN Tower, Château Frontenac in Quebec City, the glass domes of the Montreal Biosphere, and the Gothic Parliament Hill in Ottawa.', imgs:[{url:'https://images.unsplash.com/photo-1492960572319-aac3f8c3a27c?w=600&q=80',label:'Parliament Hill'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Toronto', desc:'CN Tower, Distillery District, Royal Ontario Museum, and Niagara Falls day trip.'},
+      {day:'3–4', title:'Montreal & Quebec City', desc:'Old Montreal cobblestones, Château Frontenac, Plains of Abraham, and world-class poutine.'},
+      {day:'5–6', title:'Banff & Canadian Rockies', desc:'Lake Louise, Moraine Lake, Johnston Canyon, and wildlife spotting in Banff National Park.'},
+      {day:'7', title:'Vancouver & Whistler', desc:'Stanley Park, Granville Island, Capilano Suspension Bridge, and the Sea-to-Sky Highway.'},
+    ],
+    hotels:[
+      {name:'Fairmont Royal York',city:'Toronto',rating:'4.8 ★',price:'~$300/night'},
+      {name:'Château Frontenac',city:'Quebec City',rating:'4.9 ★',price:'~$400/night'},
+      {name:'Fairmont Banff Springs',city:'Banff',rating:'4.9 ★',price:'~$500/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'International',cost:'$350–$900'},
+      {cat:'Hotels (7 nights)',icon:'fa-bed',det:'Mid to luxury',cost:'$800–$3,000'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Mix of local & dining',cost:'$30–$70/day'},
+      {cat:'Transport & Rail',icon:'fa-train',det:'VIA Rail pass',cost:'$150–$350'},
+      {cat:'TOTAL (7 days)',icon:'fa-calculator',det:'',cost:'$2,000–$5,500',total:true},
+    ],
+    flights:['DN301 YYZ→FRA 10:00','DN302 YYZ→DXB 20:30'],
+  },
+  germany: {
+    name:'Germany', flag:'🇩🇪', price:'From $420',
+    tagline:'Fairy-tale castles, world-class beer & dark history',
+    hero:'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1400&q=80',
+    stats:{ Season:'May–Sep', Temp:'0–28°C', Currency:'EUR', Language:'German' },
+    beauty:{
+      nature:{ desc:'The romantic Rhine Valley, the dark pine forests of the Black Forest, the Bavarian Alps, and the stunning Lake Constance — Germany\'s landscapes are postcard-perfect.',imgs:[{url:'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=600&q=80',label:'Neuschwanstein Castle'},{url:'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=80',label:'Rhine Valley'}]},
+      ecosystem:{ desc:'Germany\'s protected Wadden Sea mudflats, the Bavarian Forest National Park, and the Rhine floodplains support rare species including black storks, white-tailed eagles, and European bison.',imgs:[{url:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&q=80',label:'Forest Wildlife'}]},
+      architecture:{ desc:'Neuschwanstein Castle (Disney\'s inspiration), the Brandenburg Gate, Cologne Cathedral, Berlin\'s modernist parliament, and Bauhaus design schools that changed architecture forever.',imgs:[{url:'https://images.unsplash.com/photo-1599946347371-68eb71b16afc?w=600&q=80',label:'Brandenburg Gate'},{url:'https://images.unsplash.com/photo-1570939274717-7eda259b50ed?w=600&q=80',label:'Cologne Cathedral'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Berlin', desc:'Brandenburg Gate, Holocaust Memorial, Berlin Wall (East Side Gallery), Museum Island, Reichstag.'},
+      {day:'3', title:'Munich & Bavaria', desc:'Marienplatz, Hofbräuhaus, BMW Museum, English Garden, Oktoberfest grounds.'},
+      {day:'4', title:'Neuschwanstein Castle', desc:'The fairy-tale castle that inspired Sleeping Beauty, set dramatically in the Bavarian Alps.'},
+      {day:'5', title:'Rhine Valley', desc:'Cruise past medieval castles, vineyard terraces, and the legendary Lorelei Rock.'},
+    ],
+    hotels:[
+      {name:'Hotel Adlon Kempinski',city:'Berlin',rating:'4.9 ★',price:'~$400/night'},
+      {name:'The Charles Hotel',city:'Munich',rating:'4.7 ★',price:'~$300/night'},
+      {name:'Schlosshotel im Grunewald',city:'Berlin',rating:'4.8 ★',price:'~$350/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'International',cost:'$420–$900'},
+      {cat:'Hotels (7 nights)',icon:'fa-bed',det:'Mid to luxury',cost:'$600–$2,500'},
+      {cat:'Rail Pass (7 days)',icon:'fa-train',det:'Deutsche Bahn',cost:'$200–$450'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Restaurants & beer halls',cost:'$25–$60/day'},
+      {cat:'TOTAL (7 days)',icon:'fa-calculator',det:'',cost:'$1,800–$4,500',total:true},
+    ],
+    flights:['DN401 BER→DXB 11:15','DN402 BER→CMB 19:45'],
+  },
+  turkey: {
+    name:'Turkey', flag:'🇹🇷', price:'From $450',
+    tagline:'Cappadocia balloons, Istanbul mosques & Aegean coasts',
+    hero:'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1400&q=80',
+    stats:{ Season:'Apr–Jun, Sep–Oct', Temp:'10–38°C', Currency:'TRY', Language:'Turkish' },
+    beauty:{
+      nature:{ desc:'Cappadocia\'s otherworldly fairy chimneys, Pamukkale\'s white travertine thermal pools, the turquoise Aegean coastline, and Mount Ararat in the east.',imgs:[{url:'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=600&q=80',label:'Cappadocia Balloons'},{url:'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=600&q=80',label:'Pamukkale'}]},
+      ecosystem:{ desc:'Turkey bridges three biogeographical regions — Mediterranean, Irano-Turanian, and Euro-Siberian — making it one of Europe\'s most biodiverse countries.',imgs:[{url:'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=600&q=80',label:'Aegean Coast'}]},
+      architecture:{ desc:'Hagia Sophia (1,500 years old), the Blue Mosque, Topkapi Palace, the ancient city of Ephesus, and the underground cities of Cappadocia.',imgs:[{url:'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=600&q=80',label:'Hagia Sophia'},{url:'https://images.unsplash.com/photo-1570939274717-7eda259b50ed?w=600&q=80',label:'Blue Mosque'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Istanbul', desc:'Hagia Sophia, Topkapi Palace, Grand Bazaar, Bosphorus cruise, and spice markets.'},
+      {day:'3', title:'Cappadocia', desc:'Sunrise hot air balloon ride over fairy chimneys, Derinkuyu underground city, cave hotel stay.'},
+      {day:'4', title:'Pamukkale', desc:'Thermal pools and ancient Hierapolis ruins overlooking the Cotton Castle terraces.'},
+      {day:'5', title:'Ephesus', desc:'Walk the ancient marble streets of Ephesus and the Library of Celsus.'},
+    ],
+    hotels:[
+      {name:'Çırağan Palace Kempinski',city:'Istanbul',rating:'5.0 ★',price:'~$500/night'},
+      {name:'Museum Hotel',city:'Cappadocia',rating:'4.9 ★',price:'~$350/night'},
+      {name:'Paloma Pasha Resort',city:'Ephesus',rating:'4.7 ★',price:'~$180/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via IST hub',cost:'$450–$900'},
+      {cat:'Hotels (5 nights)',icon:'fa-bed',det:'Mix of luxury & boutique',cost:'$500–$2,500'},
+      {cat:'Hot Air Balloon',icon:'fa-wind',det:'Cappadocia sunrise ride',cost:'$150–$250'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Turkish cuisine',cost:'$15–$40/day'},
+      {cat:'TOTAL (5 days)',icon:'fa-calculator',det:'',cost:'$1,500–$4,000',total:true},
+    ],
+    flights:['DN501 IST→ISB 08:30','DN502 IST→MLE 16:00','DN503 IST→JFK 23:30'],
+  },
+  thailand: {
+    name:'Thailand', flag:'🇹🇭', price:'From $390',
+    tagline:'Golden temples, island paradises & vibrant street life',
+    hero:'https://images.unsplash.com/photo-1528181304800-2f5333a24751?w=1400&q=80',
+    stats:{ Season:'Nov–Mar', Temp:'25–38°C', Currency:'THB', Language:'Thai' },
+    beauty:{
+      nature:{ desc:'Phi Phi Islands, Maya Bay\'s crystal lagoon, Phang Nga Bay limestone karsts, Chiang Mai\'s northern jungles, and the Gulf of Thailand\'s pristine coral reefs.',imgs:[{url:'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=600&q=80',label:'Phi Phi Islands'},{url:'https://images.unsplash.com/photo-1528181304800-2f5333a24751?w=600&q=80',label:'Beach Paradise'}]},
+      ecosystem:{ desc:'Thailand\'s rainforest canopy is home to 300+ bird species, gibbons, elephants, and tiger populations in Khao Yai National Park. The Coral Triangle in its waters hosts 30% of global coral species.',imgs:[{url:'https://images.unsplash.com/photo-1567018054415-6b6c5e20a36b?w=600&q=80',label:'Elephant Sanctuary'}]},
+      architecture:{ desc:'The Grand Palace, Wat Phra Kaew (Emerald Buddha Temple), Wat Arun\'s spire over the Chao Phraya River, and the ancient ruins of Sukhothai and Ayutthaya.',imgs:[{url:'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=600&q=80',label:'Wat Phra Kaew'},{url:'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=600&q=80',label:'Grand Palace'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Bangkok', desc:'Grand Palace, Wat Pho, Khao San Road, floating markets, and the sky train experience.'},
+      {day:'3–4', title:'Chiang Mai', desc:'Doi Inthanon National Park, ethical elephant sanctuary, night bazaar, and cooking class.'},
+      {day:'5–6', title:'Phuket & Phi Phi', desc:'Patong Beach, island hopping to Phi Phi Islands, snorkelling at Maya Bay.'},
+      {day:'7', title:'Koh Samui', desc:'Nathon seafront, Ang Thong Marine National Park kayaking, and beach sunset cocktails.'},
+    ],
+    hotels:[
+      {name:'Mandarin Oriental',city:'Bangkok',rating:'5.0 ★',price:'~$450/night'},
+      {name:'Anantara Elephant Camp',city:'Chiang Mai',rating:'4.9 ★',price:'~$300/night'},
+      {name:'The Pavilions Resort',city:'Phuket',rating:'4.8 ★',price:'~$250/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via BKK hub',cost:'$390–$800'},
+      {cat:'Hotels (7 nights)',icon:'fa-bed',det:'Mix of resorts',cost:'$300–$2,500'},
+      {cat:'Island Hopping',icon:'fa-ship',det:'Speedboat tours',cost:'$50–$120'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Street food to fine dining',cost:'$10–$35/day'},
+      {cat:'TOTAL (7 days)',icon:'fa-calculator',det:'',cost:'$1,200–$4,000',total:true},
+    ],
+    flights:['DN601 BKK→KUL 10:45','DN602 BKK→HND 18:30'],
+  },
+  malaysia: {
+    name:'Malaysia', flag:'🇲🇾', price:'From $380',
+    tagline:'Petronas Towers, rainforest giants & Borneo wildlife',
+    hero:'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=1400&q=80',
+    stats:{ Season:'Mar–Sep', Temp:'25–35°C', Currency:'MYR', Language:'Malay / English' },
+    beauty:{
+      nature:{ desc:'The 130-million-year-old Taman Negara rainforest (older than the Amazon), Cameron Highlands tea estates, and the world-famous diving at Sipadan Island in Borneo.',imgs:[{url:'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=600&q=80',label:'Taman Negara'},{url:'https://images.unsplash.com/photo-1534008757030-27299c4371b6?w=600&q=80',label:'Cameron Highlands'}]},
+      ecosystem:{ desc:'Malaysia\'s forests hold orangutans, proboscis monkeys, pygmy elephants, and the rare Malayan tiger. Sipadan\'s waters teem with sea turtles, hammerhead sharks, and 3,000+ fish species.',imgs:[{url:'https://images.unsplash.com/photo-1567018054415-6b6c5e20a36b?w=600&q=80',label:'Orangutan Sanctuary'}]},
+      architecture:{ desc:'The iconic Petronas Twin Towers (once world\'s tallest), Penang\'s colonial UNESCO streetscapes, Malacca\'s Portuguese and Dutch heritage, and Kuala Lumpur\'s stunning KL Tower.',imgs:[{url:'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=600&q=80',label:'Petronas Towers'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Kuala Lumpur', desc:'Petronas Towers, Batu Caves, Central Market, KLCC Park, and Jalan Alor street food.'},
+      {day:'3', title:'Penang', desc:'George Town\'s street art, Penang Hill, clan jetties, and world-famous Penang Laksa.'},
+      {day:'4–5', title:'Borneo (Sabah)', desc:'Kinabalu National Park, Sepilok Orangutan Rehabilitation Centre, and Sandakan bay.'},
+      {day:'6', title:'Langkawi', desc:'Island cable car, Kilim Geopark boat tour, and duty-free shopping on the beach.'},
+    ],
+    hotels:[
+      {name:'Shangri-La Hotel',city:'Kuala Lumpur',rating:'4.9 ★',price:'~$200/night'},
+      {name:'Eastern & Oriental',city:'Penang',rating:'4.7 ★',price:'~$180/night'},
+      {name:'Gaya Island Resort',city:'Borneo',rating:'4.9 ★',price:'~$350/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via KUL hub',cost:'$380–$750'},
+      {cat:'Hotels (6 nights)',icon:'fa-bed',det:'Mixed properties',cost:'$400–$1,800'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Hawker stalls to restaurants',cost:'$10–$30/day'},
+      {cat:'Borneo Internal',icon:'fa-plane',det:'KUL–KK flight',cost:'$50–$120'},
+      {cat:'TOTAL (6 days)',icon:'fa-calculator',det:'',cost:'$1,200–$3,500',total:true},
+    ],
+    flights:['DN701 KUL→SIN 09:00','DN702 KUL→CMB 15:45'],
+  },
+  sri_lanka: {
+    name:'Sri Lanka', flag:'🇱🇰', price:'From $370',
+    tagline:'Sigiriya rock fortress, tea hills & whale watching',
+    hero:'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?w=1400&q=80',
+    stats:{ Season:'Dec–Apr', Temp:'24–33°C', Currency:'LKR', Language:'Sinhala / Tamil / English' },
+    beauty:{
+      nature:{ desc:'Ella\'s Nine Arch Bridge, Horton Plains National Park, Mirissa\'s blue whale watching, and Adam\'s Peak pilgrimage — Sri Lanka is small but extraordinarily diverse.',imgs:[{url:'https://images.unsplash.com/photo-1546708973-b339540b5162?w=600&q=80',label:'Tea Plantations Ella'},{url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',label:'Horton Plains'}]},
+      ecosystem:{ desc:'Yala National Park has the world\'s highest density of leopards. Blue whale and sperm whale migrations pass Mirissa. The mangroves of Muthurajawela protect endemic bird species.',imgs:[{url:'https://images.unsplash.com/photo-1567018054415-6b6c5e20a36b?w=600&q=80',label:'Wildlife Safari'}]},
+      architecture:{ desc:'The 5th-century Sigiriya Rock Fortress with ancient frescoes, Dambulla\'s 2,000-year-old cave temples, the Dutch Galle Fort, and Kandy\'s Temple of the Tooth Relic.',imgs:[{url:'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?w=600&q=80',label:'Sigiriya Rock Fortress'}]}
+    },
+    itinerary:[
+      {day:'1', title:'Colombo Arrival', desc:'Galle Face Green, National Museum, Pettah bazaars, and Old Dutch Hospital dining.'},
+      {day:'2–3', title:'Cultural Triangle', desc:'Sigiriya Rock Fortress (UNESCO), Dambulla Caves, and Polonnaruwa ancient city.'},
+      {day:'4', title:'Kandy', desc:'Temple of the Tooth, Peradeniya Botanical Gardens, and a traditional Kandyan dance show.'},
+      {day:'5–6', title:'Ella & Hill Country', desc:'Nine Arch Bridge, Little Adam\'s Peak hike, tea factory visit, and scenic train to Nuwara Eliya.'},
+      {day:'7', title:'Mirissa Beach', desc:'Blue whale watching boat tour and sunset dinner on the beach.'},
+    ],
+    hotels:[
+      {name:'Galle Face Hotel',city:'Colombo',rating:'4.8 ★',price:'~$150/night'},
+      {name:'Water Garden Sigiriya',city:'Sigiriya',rating:'4.9 ★',price:'~$250/night'},
+      {name:'98 Acres Resort',city:'Ella',rating:'4.8 ★',price:'~$180/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via CMB',cost:'$370–$750'},
+      {cat:'Hotels (7 nights)',icon:'fa-bed',det:'Boutique & eco resorts',cost:'$400–$1,800'},
+      {cat:'Whale Watching',icon:'fa-water',det:'Mirissa tour',cost:'$25–$50'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Curries & seafood',cost:'$8–$25/day'},
+      {cat:'TOTAL (7 days)',icon:'fa-calculator',det:'',cost:'$1,100–$3,200',total:true},
+    ],
+    flights:['DN801 CMB→MLE 08:30','DN802 CMB→ISB 17:00'],
+  },
+  uae: {
+    name:'United Arab Emirates', flag:'🇦🇪', price:'From $460',
+    tagline:'Burj Khalifa, golden deserts & world-class luxury',
+    hero:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1400&q=80',
+    stats:{ Season:'Nov–Mar', Temp:'20–48°C', Currency:'AED', Language:'Arabic / English' },
+    beauty:{
+      nature:{ desc:'The vast red dunes of the Rub\' al Khali (Empty Quarter), the Hajar Mountains of Hatta, mangrove reserves in Abu Dhabi, and the coastal coral gardens of Fujairah.',imgs:[{url:'https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=600&q=80',label:'Desert Dunes'},{url:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80',label:'Dubai Skyline'}]},
+      ecosystem:{ desc:'The UAE\'s protected Arabian oryx roam the desert reserves. The Dubai Turtle Rehabilitation Project and the mangrove forests of Eastern Mangroves Abu Dhabi are conservation landmarks.',imgs:[{url:'https://images.unsplash.com/photo-1443632864897-14973fa006cf?w=600&q=80',label:'Desert Wildlife'}]},
+      architecture:{ desc:'The Burj Khalifa (world\'s tallest building), the twisted Cayan Tower, Sheikh Zayed Grand Mosque\'s 82 domes, the Museum of the Future, and the sail-shaped Burj Al Arab.',imgs:[{url:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80',label:'Burj Khalifa'},{url:'https://images.unsplash.com/photo-1508767882845-cb11a1bf0001?w=600&q=80',label:'Sheikh Zayed Mosque'}]}
+    },
+    itinerary:[
+      {day:'1', title:'Dubai Downtown', desc:'Burj Khalifa (At The Top), Dubai Mall, Dubai Fountain show, and Dubai Frame.'},
+      {day:'2', title:'Desert Safari', desc:'Dune bashing, camel riding, sandboarding, and Bedouin camp dinner under the stars.'},
+      {day:'3', title:'Old Dubai', desc:'Gold Souk, Spice Souk, Deira, abra crossing, and Al Fahidi historical neighbourhood.'},
+      {day:'4', title:'Abu Dhabi', desc:'Sheikh Zayed Grand Mosque, Louvre Abu Dhabi, Ferrari World, and Yas Island.'},
+    ],
+    hotels:[
+      {name:'Burj Al Arab',city:'Dubai',rating:'5.0 ★',price:'~$1,800/night'},
+      {name:'Atlantis The Palm',city:'Dubai',rating:'4.9 ★',price:'~$500/night'},
+      {name:'Emirates Palace',city:'Abu Dhabi',rating:'5.0 ★',price:'~$800/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via DXB hub',cost:'$460–$950'},
+      {cat:'Hotels (5 nights)',icon:'fa-bed',det:'Luxury resorts',cost:'$700–$9,000'},
+      {cat:'Desert Safari',icon:'fa-sun',det:'Evening desert camp',cost:'$80–$200'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Street to fine dining',cost:'$20–$100/day'},
+      {cat:'TOTAL (5 days)',icon:'fa-calculator',det:'',cost:'$1,800–$12,000',total:true},
+    ],
+    flights:['DN901 DXB→JFK 07:30','DN902 DXB→ISB 13:45','DN903 DXB→MLE 22:00'],
+  },
+  indonesia: {
+    name:'Indonesia', flag:'🇮🇩', price:'From $410',
+    tagline:'Bali rice terraces, Komodo Dragons & Borobudur temple',
+    hero:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1400&q=80',
+    stats:{ Season:'Apr–Oct', Temp:'24–33°C', Currency:'IDR', Language:'Indonesian / Balinese' },
+    beauty:{
+      nature:{ desc:'Bali\'s Tegalalang rice terraces, Mount Bromo\'s volcanic sunrise, Komodo Island\'s dragons, Raja Ampat\'s coral paradise, and Lake Toba — world\'s largest volcanic lake.',imgs:[{url:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80',label:'Bali Rice Terraces'},{url:'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=80',label:'Mount Bromo Sunrise'}]},
+      ecosystem:{ desc:'Indonesia hosts the Coral Triangle (world\'s greatest marine biodiversity), Sumatran tigers, Komodo dragons, orangutans of Sumatra and Borneo, and 17,000+ islands of unique ecosystems.',imgs:[{url:'https://images.unsplash.com/photo-1588668214407-6eb95a7042f0?w=600&q=80',label:'Komodo Island'}]},
+      architecture:{ desc:'Borobudur (world\'s largest Buddhist temple), Prambanan\'s 240 Hindu shrines, the traditional Torajan carved wood clan houses of Sulawesi, and the Puri Agung royal palace of Ubud.',imgs:[{url:'https://images.unsplash.com/photo-1588668214407-6eb95a7042f0?w=600&q=80',label:'Borobudur Temple'}]}
+    },
+    itinerary:[
+      {day:'1–3', title:'Bali', desc:'Ubud Monkey Forest, Tegalalang Rice Terraces, Tanah Lot Temple, Seminyak beach sunset.'},
+      {day:'4', title:'Yogyakarta', desc:'Borobudur sunrise, Prambanan temples, and Keraton (royal palace) cultural performances.'},
+      {day:'5', title:'Mount Bromo', desc:'Pre-dawn hike to the volcanic crater rim for the most dramatic sunrise in Southeast Asia.'},
+      {day:'6', title:'Komodo Island', desc:'Hike to spot Komodo dragons, then snorkel the Pink Beach and Manta Point.'},
+    ],
+    hotels:[
+      {name:'Ayana Resort',city:'Bali',rating:'4.9 ★',price:'~$300/night'},
+      {name:'Capella Ubud',city:'Ubud',rating:'5.0 ★',price:'~$700/night'},
+      {name:'Hotel Indonesia Kempinski',city:'Jakarta',rating:'4.8 ★',price:'~$200/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via DPS/CGK',cost:'$410–$850'},
+      {cat:'Hotels (6 nights)',icon:'fa-bed',det:'Villas & eco-resorts',cost:'$300–$3,000'},
+      {cat:'Island Hopping',icon:'fa-ship',det:'Komodo boat tours',cost:'$100–$250'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Warungs to fine dining',cost:'$8–$30/day'},
+      {cat:'TOTAL (6 days)',icon:'fa-calculator',det:'',cost:'$1,300–$5,000',total:true},
+    ],
+    flights:['DN111 DPS→SIN 09:30','DN112 DPS→HND 21:00'],
+  },
+  georgia: {
+    name:'Georgia', flag:'🇬🇪', price:'From $480',
+    tagline:'Caucasus mountains, ancient wine & Tbilisi\'s charm',
+    hero:'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=1400&q=80',
+    stats:{ Season:'Apr–Oct', Temp:'5–30°C', Currency:'GEL', Language:'Georgian' },
+    beauty:{
+      nature:{ desc:'Mount Kazbegi and the Gergeti Trinity Church perched at 2,170m, the wine valleys of Kakheti, Borjomi\'s mineral springs, and the ski slopes of Gudauri.',imgs:[{url:'https://images.unsplash.com/photo-1549877452-9c387954fbc2?w=600&q=80',label:'Gergeti Trinity Church'},{url:'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=600&q=80',label:'Tbilisi Old Town'}]},
+      ecosystem:{ desc:'Georgia\'s Caucasus mountains harbor rare Caucasian leopards, brown bears, and Bezoar ibex. The Colchic rainforests of Adjara are among Europe\'s most ancient.',imgs:[{url:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&q=80',label:'Caucasus Forests'}]},
+      architecture:{ desc:'Narikala Fortress overlooking sulfur bath district, medieval defensive stone towers of Svaneti (UNESCO), Svetitskhoveli Cathedral, and Tbilisi\'s iconic balconied wooden houses.',imgs:[{url:'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=600&q=80',label:'Narikala Fortress'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Tbilisi', desc:'Old Town sulfur baths, Narikala Fortress, Rustaveli Avenue, and legendary Georgian feast (supra).'},
+      {day:'3', title:'Kazbegi', desc:'Military Highway drive, Gergeti Trinity Church hike, and the stunning Caucasus views.'},
+      {day:'4', title:'Kakheti Wine Region', desc:'Tsinandali winery, Sighnaghi (City of Love), and qvevri wine tasting.'},
+      {day:'5', title:'Uplistsikhe & Gori', desc:'Ancient cave city of Uplistsikhe and the controversial Stalin Museum in Gori.'},
+    ],
+    hotels:[
+      {name:'Rooms Hotel Tbilisi',city:'Tbilisi',rating:'4.9 ★',price:'~$200/night'},
+      {name:'Rooms Hotel Kazbegi',city:'Kazbegi',rating:'4.9 ★',price:'~$250/night'},
+      {name:'Château Mukhrani',city:'Kakheti',rating:'4.8 ★',price:'~$180/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via TBS / IST',cost:'$480–$900'},
+      {cat:'Hotels (5 nights)',icon:'fa-bed',det:'Boutique guesthouses',cost:'$300–$1,200'},
+      {cat:'Wine Tours',icon:'fa-wine-glass',det:'Kakheti winery tours',cost:'$30–$80'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Traditional Georgian',cost:'$10–$25/day'},
+      {cat:'TOTAL (5 days)',icon:'fa-calculator',det:'',cost:'$1,000–$2,800',total:true},
+    ],
+    flights:['DN121 TBS→IST 10:15','DN122 TBS→BER 17:30'],
+  },
+  nepal: {
+    name:'Nepal', flag:'🇳🇵', price:'From $440',
+    tagline:'Everest base camp, ancient stupas & Himalayan serenity',
+    hero:'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=1400&q=80',
+    stats:{ Season:'Mar–May, Oct–Nov', Temp:'5–28°C', Currency:'NPR', Language:'Nepali / English' },
+    beauty:{
+      nature:{ desc:'Mount Everest (8,849m), the Annapurna Circuit trek, Phewa Lake in Pokhara, and the wild rhino grasslands of Chitwan National Park.',imgs:[{url:'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80',label:'Himalayan Range'},{url:'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80',label:'Everest View Trek'}]},
+      ecosystem:{ desc:'Nepal\'s ecosystem spans tropical jungle (Chitwan) to alpine tundra (Everest). One-horned rhinos, Bengal tigers, red pandas, and snow leopards make it a wildlife paradise.',imgs:[{url:'https://images.unsplash.com/photo-1567018054415-6b6c5e20a36b?w=600&q=80',label:'Chitwan National Park'}]},
+      architecture:{ desc:'Swayambhunath Stupa (Monkey Temple), Boudhanath (world\'s largest stupa, UNESCO), Pashupatinath\'s sacred Hindu ghats, and the medieval royal squares of Bhaktapur and Patan.',imgs:[{url:'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&q=80',label:'Boudhanath Stupa'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Kathmandu Valley', desc:'Swayambhunath, Boudhanath, Pashupatinath, and the medieval Durbar Squares.'},
+      {day:'3', title:'Pokhara', desc:'Phewa Lake boat ride, Annapurna views from Sarangkot at sunrise, Davis Falls.'},
+      {day:'4–5', title:'EBC Trek Acclimatization', desc:'Fly to Lukla, trek to Namche Bazaar for acclimatization and Everest view hike.'},
+      {day:'6', title:'Chitwan Safari', desc:'Jungle jeep safari spotting rhinos and royal Bengal tigers in Chitwan National Park.'},
+    ],
+    hotels:[
+      {name:"Dwarika's Hotel",city:'Kathmandu',rating:'4.9 ★',price:'~$250/night'},
+      {name:'Pavilions Himalayas',city:'Pokhara',rating:'4.8 ★',price:'~$200/night'},
+      {name:'Yeti Mountain Home',city:'Phakding',rating:'4.7 ★',price:'~$80/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'Via KTM',cost:'$440–$850'},
+      {cat:'Hotels (6 nights)',icon:'fa-bed',det:'Mix of lodge & luxury',cost:'$300–$1,500'},
+      {cat:'Trekking Permits',icon:'fa-hiking',det:'TIMS + NP entry',cost:'$30–$70'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Dal bhat to dining',cost:'$8–$25/day'},
+      {cat:'TOTAL (6 days)',icon:'fa-calculator',det:'',cost:'$1,200–$3,200',total:true},
+    ],
+    flights:['DN131 KTM→DEL 08:00','DN132 KTM→DXB 16:30'],
+  },
+  maldives: {
+    name:'Maldives', flag:'🇲🇻', price:'From $590',
+    tagline:'Overwater villas, bioluminescent beaches & whale sharks',
+    hero:'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1400&q=80',
+    stats:{ Season:'Nov–Apr', Temp:'27–31°C', Currency:'MVR', Language:'Dhivehi / English' },
+    beauty:{
+      nature:{ desc:'1,200 coral islands of crystal turquoise atolls, bioluminescent plankton beaches on Vaadhoo Island, pristine white sand, and sunsets that defy description.',imgs:[{url:'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80',label:'Turquoise Lagoon'},{url:'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=600&q=80',label:'Aerial Atoll View'}]},
+      ecosystem:{ desc:'Manta rays, whale sharks, reef sharks, turtles, and 1,100+ species of fish inhabit the Maldives\' house reefs. It\'s one of the world\'s richest marine ecosystems.',imgs:[{url:'https://images.unsplash.com/photo-1570481662006-a3a1374699e8?w=600&q=80',label:'Coral Reef Diving'}]},
+      architecture:{ desc:'Luxury overwater bungalows on stilts, glass-floor underwater restaurants, traditional Maldivian dhow boats (dhoni), and the colorful capital Malé with its ornate Islamic Centre.',imgs:[{url:'https://images.unsplash.com/photo-1512100356356-de1b84283e18?w=600&q=80',label:'Overwater Villa'}]}
+    },
+    itinerary:[
+      {day:'1', title:'Arrival & Seaplane Transfer', desc:'Malé arrival, seaplane to your island resort — already paradise begins.'},
+      {day:'2–3', title:'Reef Snorkelling & Diving', desc:'House reef snorkel, sunset manta ray cruise, and certified dive at Maaya Thila.'},
+      {day:'4', title:'Whale Shark Excursion', desc:'Boat trip to South Ari Atoll for swimming with whale sharks in open water.'},
+      {day:'5', title:'Local Island & Spa', desc:'Dhoni trip to a local Maldivian fishing island, then resort spa and beach yoga.'},
+      {day:'6', title:'Sunrise Kayaking & Departure', desc:'Kayak at dawn to see the bioluminescent plankton, then transfer back to Malé.'},
+    ],
+    hotels:[
+      {name:'Soneva Jani',city:'Noonu Atoll',rating:'5.0 ★',price:'~$3,000/night'},
+      {name:'Conrad Rangali Island',city:'South Ari Atoll',rating:'4.9 ★',price:'~$1,200/night'},
+      {name:'W Maldives',city:'North Ari Atoll',rating:'4.9 ★',price:'~$1,000/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'To MLE',cost:'$590–$1,200'},
+      {cat:'Seaplane Transfer',icon:'fa-helicopter',det:'Island resort transfer',cost:'$300–$600'},
+      {cat:'Resort (5 nights)',icon:'fa-bed',det:'All-inclusive luxury',cost:'$2,000–$15,000'},
+      {cat:'Whale Shark Tour',icon:'fa-water',det:'Day excursion',cost:'$80–$150'},
+      {cat:'TOTAL (6 days)',icon:'fa-calculator',det:'',cost:'$4,000–$20,000',total:true},
+    ],
+    flights:['DN141 MLE→CMB 09:30','DN142 MLE→DXB 18:00'],
+  },
+  japan: {
+    name:'Japan', flag:'🇯🇵', price:'From $550',
+    tagline:'Cherry blossoms, samurai history & futuristic Tokyo',
+    hero:'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1400&q=80',
+    stats:{ Season:'Mar–May, Oct–Nov', Temp:'5–36°C', Currency:'JPY', Language:'Japanese' },
+    beauty:{
+      nature:{ desc:'Mount Fuji\'s perfect volcanic cone, Arashiyama\'s bamboo grove, Hokkaido\'s lavender fields, Nikko\'s cryptomeria forests, and Okinawa\'s tropical coral reefs.',imgs:[{url:'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&q=80',label:'Kyoto Temple'},{url:'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=600&q=80',label:'Tokyo at Night'}]},
+      ecosystem:{ desc:'Japan\'s diverse ecosystems range from subtropical Okinawan reefs to subarctic Hokkaido snowfields. The Japanese macaque, Iriomote cat, and giant salamander are iconic endemic species.',imgs:[{url:'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=600&q=80',label:'Arashiyama Bamboo Grove'}]},
+      architecture:{ desc:'Senso-ji (628 AD), Himeji Castle (UNESCO), Kyoto\'s 1,600 Buddhist temples, Tokyo\'s ultra-modern Shibuya Crossing skyscrapers, and the minimalist Naoshima art island.',imgs:[{url:'https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=600&q=80',label:'Fushimi Inari Shrine'}]}
+    },
+    itinerary:[
+      {day:'1–3', title:'Tokyo', desc:'Shibuya Crossing, Senso-ji Temple, Akihabara, teamLab Borderless, and ramen in a tiny alley.'},
+      {day:'4', title:'Nikko Day Trip', desc:'Toshogu Shrine, Kegon Falls, and the ancient cryptomeria forest avenue.'},
+      {day:'5–6', title:'Kyoto', desc:'Fushimi Inari, Kinkaku-ji, Arashiyama bamboo, Gion geisha district, and kaiseki dinner.'},
+      {day:'7', title:'Osaka & Hiroshima', desc:'Dotonbori, Osaka Castle, then bullet train to Hiroshima Peace Memorial and Miyajima Island.'},
+    ],
+    hotels:[
+      {name:'Park Hyatt Tokyo',city:'Tokyo',rating:'4.9 ★',price:'~$600/night'},
+      {name:'Hoshinoya Kyoto',city:'Kyoto',rating:'5.0 ★',price:'~$800/night'},
+      {name:'The Ritz-Carlton Osaka',city:'Osaka',rating:'4.9 ★',price:'~$500/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'To NRT/HND',cost:'$550–$1,200'},
+      {cat:'JR Rail Pass (14 days)',icon:'fa-train',det:'Bullet train nationwide',cost:'$400–$600'},
+      {cat:'Hotels (8 nights)',icon:'fa-bed',det:'Mix of modern & ryokan',cost:'$800–$5,000'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Ramen to kaiseki',cost:'$20–$80/day'},
+      {cat:'TOTAL (8 days)',icon:'fa-calculator',det:'',cost:'$2,500–$8,000',total:true},
+    ],
+    flights:['DN151 HND→JFK 11:30','DN152 HND→BKK 19:00'],
+  },
+  egypt: {
+    name:'Egypt', flag:'🇪🇬', price:'From $470',
+    tagline:'Pyramids of Giza, Nile River & Red Sea diving',
+    hero:'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=1400&q=80',
+    stats:{ Season:'Oct–Apr', Temp:'15–40°C', Currency:'EGP', Language:'Arabic / English' },
+    beauty:{
+      nature:{ desc:'The Sahara\'s Great Sand Sea, the fertile Nile Delta, the White Desert\'s surreal rock formations, the Red Sea coral reefs of Sharm El Sheikh, and the lush Siwa Oasis.',imgs:[{url:'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=600&q=80',label:'Pyramids of Giza'},{url:'https://images.unsplash.com/photo-1572252009286-268acec5a0af?w=600&q=80',label:'Nile River Sunset'}]},
+      ecosystem:{ desc:'Egypt\'s Red Sea hosts 1,200 fish species and 250 coral species, making Sharm El Sheikh and Dahab world-famous dive sites. The Western Desert\'s White Desert has unique chalk rock ecosystems.',imgs:[{url:'https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=600&q=80',label:'Red Sea Diving'}]},
+      architecture:{ desc:'The Pyramids of Giza and the Great Sphinx (4,500 years old), Karnak Temple at Luxor, the Valley of the Kings, Abu Simbel\'s colossal statues, and Cairo\'s Islamic old city.',imgs:[{url:'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=600&q=80',label:'Giza Pyramids'},{url:'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=600&q=80',label:'Luxor Temple'}]}
+    },
+    itinerary:[
+      {day:'1–2', title:'Cairo', desc:'Pyramids of Giza and Sphinx at sunrise, Egyptian Museum (Tutankhamun\'s gold), and Khan el-Khalili bazaar.'},
+      {day:'3', title:'Nile Cruise (Luxor)', desc:'Board a felucca on the Nile, visit Karnak Temple complex and the Valley of the Kings.'},
+      {day:'4', title:'Aswan & Abu Simbel', desc:'Fly to Aswan, see Philae Temple on Nile Island, and optional Abu Simbel colossal statues trip.'},
+      {day:'5–6', title:'Sharm El Sheikh', desc:'Red Sea snorkelling, diving at Ras Mohammed National Park, and Naama Bay nightlife.'},
+    ],
+    hotels:[
+      {name:'Marriott Mena House',city:'Cairo',rating:'4.9 ★',price:'~$250/night'},
+      {name:'Sofitel Winter Palace',city:'Luxor',rating:'4.8 ★',price:'~$200/night'},
+      {name:'Four Seasons Sharm',city:'Sharm El Sheikh',rating:'4.8 ★',price:'~$300/night'},
+    ],
+    expenses:[
+      {cat:'Return Flights',icon:'fa-plane',det:'To CAI',cost:'$470–$900'},
+      {cat:'Hotels (6 nights)',icon:'fa-bed',det:'Luxury hotels',cost:'$500–$2,000'},
+      {cat:'Nile Cruise',icon:'fa-ship',det:'2-night felucca',cost:'$80–$200'},
+      {cat:'Red Sea Diving',icon:'fa-water',det:'Certified dive trips',cost:'$50–$120/day'},
+      {cat:'Food (daily)',icon:'fa-utensils',det:'Local & hotels',cost:'$12–$35/day'},
+      {cat:'TOTAL (6 days)',icon:'fa-calculator',det:'',cost:'$1,500–$4,000',total:true},
+    ],
+    flights:['DN161 CAI→IST 10:30','DN162 CAI→DXB 22:00'],
+  },
+};
+
+// Standalone Booking Redirect logic
+// Database and E-Ticket integrations are preserved in localStorage
+
+
+// ═══════════════════════════════════════
+// RENDER COUNTRY PAGE
+// ═══════════════════════════════════════
+function init(){
+  const params=new URLSearchParams(window.location.search);
+  const key=params.get('c');
+  const d=cpData[key];
+  if(!d){ document.body.innerHTML='<div style="text-align:center;padding:4rem;"><h2>Country not found.</h2><a href="index.html">Go Back</a></div>'; return; }
+
+  document.title=`Danoria — ${d.name}`;
+  document.getElementById('cpHeroBg').style.backgroundImage=`url(${d.hero})`;
+  document.getElementById('cpFlag').textContent=d.flag;
+  document.getElementById('cpName2').textContent=d.name;
+  document.getElementById('cpTagline').textContent=d.tagline;
+  document.getElementById('cpStripPrice').textContent=d.price;
+
+  // STATS
+  document.getElementById('cpStats').innerHTML=Object.entries(d.stats).map(([k,v])=>`
+    <div class="cp-stat"><span class="cp-stat-val">${v}</span><span class="cp-stat-lbl">${k}</span></div>`).join('');
+
+  // BEAUTY TABS
+  ['nature','ecosystem','architecture'].forEach(type=>{
+    const data=d.beauty[type];
+    document.getElementById(`${type}Desc`).textContent=data.desc;
+    const prefix=type==='nature'?'natur':type==='ecosystem'?'eco':'arch';
+    document.getElementById(`${prefix}Imgs`).innerHTML=data.imgs.map(img=>`
+      <div class="cp-img-card">
+        <img src="${img.url}" alt="${img.label}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=80'"/>
+        <div class="cp-img-label">${img.label}</div>
+      </div>`).join('');
+  });
+
+  // ITINERARY
+  document.getElementById('cpItinerary').innerHTML=d.itinerary.map(i=>`
+    <div class="cp-itin-item">
+      <div class="cp-itin-day"><span>Day</span><strong>${i.day}</strong></div>
+      <div class="cp-itin-body"><h4>${i.title}</h4><p>${i.desc}</p></div>
+    </div>`).join('');
+
+  // HOTELS
+  document.getElementById('cpHotels').innerHTML=d.hotels.map(h=>`
+    <div class="cp-hotel-card">
+      <div class="cp-hotel-name">${h.name}</div>
+      <div class="cp-hotel-city"><i class="fas fa-map-marker-alt"></i>${h.city}</div>
+      <div class="cp-hotel-rating">${h.rating}</div>
+      <div class="cp-hotel-price">${h.price}</div>
+    </div>`).join('');
+
+  // EXPENSES
+  document.getElementById('cpExpenseBody').innerHTML=d.expenses.map(e=>`
+    <tr class="${e.total?'total-row':''}">
+      <td><i class="fas ${e.icon}" style="color:#0ea5e9;margin-right:.5rem;"></i>${e.cat}</td>
+      <td style="color:#64748b;font-size:.85rem;">${e.det}</td>
+      <td><strong>${e.cost}</strong></td>
+    </tr>`).join('');
+
+  // TABS
+  document.querySelectorAll('.cp-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.cp-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.cp-tab-content').forEach(c=>c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  // BOOK BUTTON
+  document.getElementById('cpBookBtnMain').addEventListener('click',()=>{
+    const fc=d.flights[0].split(' ')[0];
+    const savedUser = localStorage.getItem('danoria_current_user');
+    if (!savedUser) {
+      alert("Authentication required. Please log in on the home page first.");
+      window.location.href = "index.html?triggerAuth=true";
+      return;
+    }
+    const url = `booking.html?flight=${encodeURIComponent(fc)}&route=${encodeURIComponent(d.name + ' Round Trip')}&price=${encodeURIComponent(d.price)}`;
+    window.location.href = url;
+  });
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
